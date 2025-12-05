@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Kayıt Ol - Nefis Yemekler{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Kayıt Ol</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Şifre</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password_confirm" class="form-label">Şifre Tekrar</label>
+                            <input type="password" class="form-control" id="password_confirm" 
+                                   name="password_confirm" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-user-plus"></i> Kayıt Ol
+                        </button>
+                    </form>
+                    <hr>
+                    <p class="text-center mb-0">
+                        Zaten hesabınız var mı? <a href="{{ url_for('login') }}">Giriş yapın</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

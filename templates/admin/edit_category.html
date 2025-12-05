@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Kategori Düzenle - Nefis Yemekler{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-utensils"></i> Tarifler
+                </a>
+                <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tags"></i> Kategoriler
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users"></i> Kullanıcılar
+                </a>
+                <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-comments"></i> Yorumlar
+                </a>
+                <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-file-alt"></i> Sayfalar
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <h1 class="mb-4"><i class="fas fa-edit"></i> Kategori Düzenle</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Kategori Adı *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ category.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="slug" class="form-label">Slug *</label>
+                            <input type="text" class="form-control" id="slug" name="slug" 
+                                   value="{{ category.slug }}" required>
+                            <small class="text-muted">URL'de kullanılacak (örn: kahvalti, tatlilar)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Açıklama</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3">{{ category.description or '' }}</textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin_categories') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Güncelle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

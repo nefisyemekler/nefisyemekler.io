@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Hakkımızda - Nefis Yemekler{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% if page %}
+                <h1 class="mb-4">{{ page.title }}</h1>
+                <div class="content">
+                    {{ page.content|safe }}
+                </div>
+            {% else %}
+                <h1 class="mb-4">Hakkımızda</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Nefis Yemekler'e Hoş Geldiniz!</h3>
+                        <p>Biz, yemek yapmanın sadece bir ihtiyaç değil, aynı zamanda bir sanat ve tutku olduğuna inanıyoruz. 
+                        Nefis Yemekler platformu, lezzetli tarifleri paylaşmak, yeni tatlar keşfetmek ve mutfak deneyimlerinizi 
+                        geliştirmek için oluşturuldu.</p>
+                        
+                        <h4 class="mt-4">Misyonumuz</h4>
+                        <p>Türk mutfağının zengin lezzetlerini ve dünya mutfaklarından seçkin tarifleri bir araya getirerek, 
+                        herkesin kolayca erişebileceği bir tarif platformu oluşturmak.</p>
+                        
+                        <h4 class="mt-4">Vizyonumuz</h4>
+                        <p>Türkiye'nin en kapsamlı ve kullanıcı dostu yemek tarifi platformu olmak.</p>
+                        
+                        <h4 class="mt-4">Değerlerimiz</h4>
+                        <ul>
+                            <li>Kaliteli ve test edilmiş tarifler</li>
+                            <li>Kullanıcı dostu arayüz</li>
+                            <li>Topluluk odaklı yaklaşım</li>
+                            <li>Sürekli gelişim ve yenilik</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

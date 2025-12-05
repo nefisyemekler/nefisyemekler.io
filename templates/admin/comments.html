@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Yorumlar - Nefis Yemekler{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-utensils"></i> Tarifler
+                </a>
+                <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tags"></i> Kategoriler
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users"></i> Kullanıcılar
+                </a>
+                <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-comments"></i> Yorumlar
+                </a>
+                <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-file-alt"></i> Sayfalar
+                </a>
+                <hr>
+                <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-arrow-left"></i> Siteye Dön
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <h1 class="mb-4"><i class="fas fa-comments"></i> Yorumlar Yönetimi</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Tarif</th>
+                                    <th>Yorum</th>
+                                    <th>Puan</th>
+                                    <th>Tarih</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for comment in comments %}
+                                <tr>
+                                    <td>{{ comment.id }}</td>
+                                    <td>{{ comment.user.username }}</td>
+                                    <td>
+                                        <a href="{{ url_for('recipe_detail', recipe_id=comment.recipe.id) }}" 
+                                           target="_blank">
+                                            {{ comment.recipe.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ comment.body[:50] }}...</td>
+                                    <td>
+                                        {% if comment.rating %}
+                                        <span class="text-warning">
+                                            {% for i in range(comment.rating) %}
+                                                <i class="fas fa-star"></i>
+                                            {% endfor %}
+                                        </span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>
+                                        <form action="{{ url_for('admin_delete_comment', comment_id=comment.id) }}" 
+                                              method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" 
+                                                    onclick="return confirm('Bu yorumu silmek istediğinizden emin misiniz?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if not comments %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle"></i> Henüz yorum bulunmuyor.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Tariflerim - Nefis Yemekler{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-book"></i> Tariflerim</h1>
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Yeni Tarif Ekle
+        </a>
+    </div>
+    
+    <div class="row">
+        {% for recipe in recipes %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100">
+                {% if recipe.image %}
+                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                     class="card-img-top" alt="{{ recipe.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
+                     style="height: 200px;">
+                    <i class="fas fa-utensils fa-3x text-white"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <p class="card-text">{{ recipe.content[:100] }}...</p>
+                    <div class="mb-2">
+                        <span class="badge bg-primary">{{ recipe.category.name }}</span>
+                        <span class="text-muted small">
+                            {{ recipe.comments|length }} yorum
+                        </span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Görüntüle
+                        </a>
+                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" 
+                           class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not recipes %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle"></i> Henüz tarif eklemediniz.
+        <br>
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary mt-3">
+            <i class="fas fa-plus-circle"></i> İlk Tarifini Ekle
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
