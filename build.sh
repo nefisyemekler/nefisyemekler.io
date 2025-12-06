@@ -8,9 +8,9 @@ pip install -r requirements.txt
 mkdir -p static/uploads
 
 # Initialize database
-python -c "from app import app, db; app.app_context().push(); db.create_all(); print('Database initialized')"
+python3 -c "from app import app, db; app.app_context().push(); db.create_all(); print('Database initialized')"
 
 # Run seed script if it exists
 if [ -f seed.py ]; then
-    python seed.py || echo "Seed script failed or not needed"
+    python3 seed.py || echo "Seed script failed or not needed"
 fi
