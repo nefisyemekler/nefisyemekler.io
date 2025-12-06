@@ -46,20 +46,7 @@
     </div>
 </section>
 
-<!-- Kategoriler - Kompakt -->
-<section class="py-4 bg-light">
-    <div class="container">
-        <h5 class="mb-3"><i class="fas fa-list"></i> Kategoriler</h5>
-        <div class="d-flex flex-wrap gap-2">
-            {% for category in categories %}
-            <a href="{{ url_for('category', slug=category.slug) }}" 
-               class="btn btn-outline-primary btn-sm">
-                {{ category.name }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-</section>
+<!-- Kategoriler Kaldırıldı - Navbar'da mevcut -->
 
 <!-- Tarifler -->
 <section class="py-5">
