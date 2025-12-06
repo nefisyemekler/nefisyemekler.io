@@ -261,32 +261,41 @@ with app.app_context():
         # Get admin user for recipe creation
         admin = User.query.filter_by(username='admin').first()
         if admin:
-            for recipe_data in sample_recipes:
-                # Get category by slug
-                category = Category.query.filter_by(slug=recipe_data['category_slug']).first()
-                if category:
-                    # Check if recipe already exists
-                    existing_recipe = Recipe.query.filter_by(
-                        title=recipe_data['title'],
-                        category_id=category.id
-                    ).first()
-                    
-                    if not existing_recipe:
-                        recipe = Recipe(
-                            title=recipe_data['title'],
-                            content=recipe_data['content'],
-                            ingredients=recipe_data['ingredients'],
-                            instructions=recipe_data['instructions'],
-                            category_id=category.id,
-                            user_id=admin.id,
-                            prep_time=recipe_data.get('prep_time'),
-                            cook_time=recipe_data.get('cook_time'),
-                            servings=recipe_data.get('servings')
-                        )
-                        db.session.add(recipe)
-                        print(f'✓ Recipe added: {recipe_data["title"]}')
+            # Check if we need to add sample recipes (if database is empty or missing recipes)
+            existing_recipe_count = Recipe.query.count()
+            print(f'Current recipe count: {existing_recipe_count}')
             
-            db.session.commit()
+            if existing_recipe_count < len(sample_recipes):
+                print('Adding sample recipes...')
+                for recipe_data in sample_recipes:
+                    # Get category by slug
+                    category = Category.query.filter_by(slug=recipe_data['category_slug']).first()
+                    if category:
+                        # Check if recipe already exists
+                        existing_recipe = Recipe.query.filter_by(
+                            title=recipe_data['title'],
+                            category_id=category.id
+                        ).first()
+                        
+                        if not existing_recipe:
+                            recipe = Recipe(
+                                title=recipe_data['title'],
+                                content=recipe_data['content'],
+                                ingredients=recipe_data['ingredients'],
+                                instructions=recipe_data['instructions'],
+                                category_id=category.id,
+                                user_id=admin.id,
+                                prep_time=recipe_data.get('prep_time'),
+                                cook_time=recipe_data.get('cook_time'),
+                                servings=recipe_data.get('servings')
+                            )
+                            db.session.add(recipe)
+                            print(f'✓ Recipe added: {recipe_data["title"]}')
+                
+                db.session.commit()
+                print(f'✓ Sample recipes added! Total: {Recipe.query.count()}')
+            else:
+                print('✓ Sample recipes already exist')
         
         print('✓ Database initialization complete!')
         
