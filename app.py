@@ -7,6 +7,12 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from models import db, User, Category, Recipe, Comment, Page, Image
 from datetime import datetime
+import os
+import json
+import re
+import requests
+import time
+import traceback
 
 # Load environment variables
 load_dotenv()
