@@ -56,6 +56,7 @@ with app.app_context():
             {'name': 'Tatlılar', 'slug': 'tatlilar', 'description': 'Damak tadınıza uygun tatlı tarifleri'},
             {'name': 'Çorbalar', 'slug': 'corbalar', 'description': 'Sıcacık ve doyurucu çorba tarifleri'},
             {'name': 'Salatalar', 'slug': 'salatalar', 'description': 'Sağlıklı ve ferahlatıcı salata tarifleri'},
+            {'name': 'Dünya Mutfağı', 'slug': 'dunya-mutfagi', 'description': 'Dünyanın farklı ülkelerinden lezzetli tarifler'},
         ]
         
         for cat_data in categories_data:
@@ -66,6 +67,227 @@ with app.app_context():
                 print(f'✓ Category added: {cat_data["name"]}')
         
         db.session.commit()
+        
+        # Add sample recipes for each category (3 per category)
+        sample_recipes = [
+            # Kahvaltı
+            {
+                'title': 'Menemen',
+                'content': 'Kahvaltının vazgeçilmez lezzeti menemen. Domates, biber ve yumurtayla hazırlanan bu enfes tarif sofranızı şenlendirecek.',
+                'ingredients': '4 adet yumurta\n2 adet domates\n2 adet sivri biber\n1 yemek kaşığı tereyağı\nTuz, karabiber',
+                'instructions': '1. Biberleri ve domatesleri küp küp doğrayın\n2. Tereyağını tavada eritin\n3. Biberleri ekleyip kavurun\n4. Domatesleri ekleyin ve suyunu çekene kadar pişirin\n5. Yumurtaları kırıp karıştırın\n6. Baharatları ekleyip servise hazır hale getirin',
+                'category_slug': 'kahvalti',
+                'prep_time': 10,
+                'cook_time': 15,
+                'servings': 2
+            },
+            {
+                'title': 'Gözleme',
+                'content': 'El açması hamuruyla yapılan geleneksel Türk böreği. Peynirli, patatesli veya kıymalı olarak hazırlayabilirsiniz.',
+                'ingredients': '3 su bardağı un\n1 su bardağı ılık su\n1 çay kaşığı tuz\n200g beyaz peynir\nMaydanoz',
+                'instructions': '1. Unu ve tuzu karıştırın\n2. Suyu ekleyip yoğurun\n3. Bezelyeleri hazırlayın\n4. Hamuru açıp iç malzemeyi yerleştirin\n5. Sacda veya tavada pişirin',
+                'category_slug': 'kahvalti',
+                'prep_time': 30,
+                'cook_time': 20,
+                'servings': 4
+            },
+            {
+                'title': 'Simit',
+                'content': 'Tahinli susam kaplı geleneksel Türk simidi. Evde kolayca yapabileceğiniz nefis bir tarif.',
+                'ingredients': '500g un\n10g yaş maya\n1 su bardağı ılık süt\n1 yemek kaşığı şeker\n1 çay kaşığı tuz\nTahin\nSusam',
+                'instructions': '1. Mayalı hamuru hazırlayın\n2. Dinlendirin\n3. Simit şekli verin\n4. Tahin ve susamla kaplayın\n5. Fırında pişirin',
+                'category_slug': 'kahvalti',
+                'prep_time': 45,
+                'cook_time': 25,
+                'servings': 6
+            },
+            # Ana Yemekler
+            {
+                'title': 'Karnıyarık',
+                'content': 'Patlıcanın kıymayla buluştuğu muhteşem Türk yemeği. Fırında pişen bu lezzet sofranızın yıldızı olacak.',
+                'ingredients': '6 adet patlıcan\n300g kıyma\n2 adet soğan\n3 adet domates\n2 adet sivri biber\nSalça, baharat',
+                'instructions': '1. Patlıcanları kızartın\n2. İç harcı hazırlayın\n3. Patlıcanları yarmadan ortasını açın\n4. İç harcı doldurun\n5. Fırında pişirin',
+                'category_slug': 'ana-yemekler',
+                'prep_time': 30,
+                'cook_time': 45,
+                'servings': 6
+            },
+            {
+                'title': 'Mantı',
+                'content': 'Kayseri\'nin meşhur mantısı. El açması hamurdan yapılan mini börekler yoğurt ve tereyağı sosuyla servis edilir.',
+                'ingredients': '500g un\n2 adet yumurta\n250g kıyma\nSoğan, tuz\nYoğurt\nTereyağı\nPul biber',
+                'instructions': '1. Hamuru hazırlayın ve incecik açın\n2. Küçük kareler kesin\n3. İç harcı yerleştirin ve kapatın\n4. Haşlayın\n5. Yoğurt ve tereyağı sosuyla servis edin',
+                'category_slug': 'ana-yemekler',
+                'prep_time': 60,
+                'cook_time': 20,
+                'servings': 4
+            },
+            {
+                'title': 'İskender Kebap',
+                'content': 'Bursa\'nın dünyaca ünlü kebabı. Döner eti, pide, domates sosu ve tereyağıyla hazırlanan muhteşem lezzet.',
+                'ingredients': '500g döner eti\n4 adet pide\n4 yemek kaşığı tereyağı\n2 su bardağı domates sosu\nYoğurt',
+                'instructions': '1. Döner etini dilimleyin\n2. Pideleri kesin ve yerleştirin\n3. Üzerine döner ekleyin\n4. Domates sosu dökün\n5. Tereyağını eritip gezdirin\n6. Yoğurtla servis edin',
+                'category_slug': 'ana-yemekler',
+                'prep_time': 20,
+                'cook_time': 30,
+                'servings': 4
+            },
+            # Tatlılar
+            {
+                'title': 'Baklava',
+                'content': 'Fıstıklı, cevizli veya fındıklı olarak hazırlayabileceğiniz geleneksel Türk tatlısı.',
+                'ingredients': '1 paket baklavalık yufka\n300g tereyağı\n400g antep fıstığı\n2 su bardağı şeker\n2 su bardağı su',
+                'instructions': '1. Yufkaları yağlayın ve dizin\n2. Fıstıkları serpin\n3. Dilimleyin\n4. Fırında pişirin\n5. Şerbeti dökün',
+                'category_slug': 'tatlilar',
+                'prep_time': 45,
+                'cook_time': 50,
+                'servings': 12
+            },
+            {
+                'title': 'Sütlaç',
+                'content': 'Fırında pişen geleneksel Türk sütlü tatlısı. Yumuşacık pirinç taneleriyle hazırlanan harika bir lezzet.',
+                'ingredients': '1 litre süt\n1/2 su bardağı pirinç\n1 su bardağı şeker\n1 yemek kaşığı un\nVanilya',
+                'instructions': '1. Pirinci haşlayın\n2. Sütü ekleyin\n3. Şeker ve unu ekleyin\n4. Kıvam alana kadar pişirin\n5. Fırında üzerini kızartın',
+                'category_slug': 'tatlilar',
+                'prep_time': 15,
+                'cook_time': 60,
+                'servings': 6
+            },
+            {
+                'title': 'Kazandibi',
+                'content': 'Tavuk göğsüyle yapılan geleneksel Osmanlı tatlısı. Alt tarafı karamelize edilmiş sütlü tatlı.',
+                'ingredients': '1 litre süt\n150g tavuk göğsü\n1 su bardağı şeker\n2 yemek kaşığı un\nVanilya',
+                'instructions': '1. Tavuk göğsünü haşlayıp didikleyin\n2. Sütü kaynatın\n3. Malzemeleri ekleyip pişirin\n4. Tepsiye döküp altını kızartın\n5. Rulo yapıp servis edin',
+                'category_slug': 'tatlilar',
+                'prep_time': 30,
+                'cook_time': 45,
+                'servings': 8
+            },
+            # Çorbalar
+            {
+                'title': 'Mercimek Çorbası',
+                'content': 'Türk mutfağının vazgeçilmez çorbası. Kırmızı mercimek ve sebzelerle hazırlanan sağlıklı ve doyurucu tarif.',
+                'ingredients': '1 su bardağı kırmızı mercimek\n1 adet soğan\n1 adet havuç\n1 yemek kaşığı salça\nTuz, karabiber\nLimon',
+                'instructions': '1. Mercimeği yıkayın\n2. Sebzeleri doğrayın ve kavurun\n3. Mercimek ve suyu ekleyin\n4. Pişirin ve blenderdan geçirin\n5. Baharatları ekleyin',
+                'category_slug': 'corbalar',
+                'prep_time': 10,
+                'cook_time': 30,
+                'servings': 4
+            },
+            {
+                'title': 'Ezogelin Çorbası',
+                'content': 'Gaziantep\'in meşhur çorbası. Kırmızı mercimek, bulgur ve pirinçle hazırlanan nefis bir tarif.',
+                'ingredients': '1 su bardağı kırmızı mercimek\n1/2 su bardağı bulgur\n1/4 su bardağı pirinç\n1 yemek kaşığı salça\nNane, kırmızı biber',
+                'instructions': '1. Mercimek, bulgur ve pirinci kaynatın\n2. Salçayı kavurun\n3. Karıştırıp pişirin\n4. Baharat ekleyin\n5. Sıcak servis edin',
+                'category_slug': 'corbalar',
+                'prep_time': 10,
+                'cook_time': 35,
+                'servings': 6
+            },
+            {
+                'title': 'Yayla Çorbası',
+                'content': 'Yoğurtlu ve nane aromalı geleneksel Türk çorbası. Yaz aylarında ferahlatıcı, kış aylarında ısıtıcı.',
+                'ingredients': '2 su bardağı yoğurt\n1/2 su bardağı pirinç\n1 yemek kaşığı un\nTuz\nNane, tereyağı',
+                'instructions': '1. Pirinci haşlayın\n2. Yoğurt ve unu çırpın\n3. Pirinç suyuna ekleyin\n4. Pişirin\n5. Naneli tereyağıyla servis edin',
+                'category_slug': 'corbalar',
+                'prep_time': 10,
+                'cook_time': 25,
+                'servings': 4
+            },
+            # Salatalar
+            {
+                'title': 'Çoban Salatası',
+                'content': 'Taze sebzelerle hazırlanan klasik Türk salatası. Yaz aylarının vazgeçilmez tariflerinden.',
+                'ingredients': '4 adet domates\n2 adet salatalık\n2 adet sivri biber\n1 adet soğan\nMaydanoz\nZeytinyağı, limon, nar ekşisi',
+                'instructions': '1. Tüm sebzeleri küp küp doğrayın\n2. Maydanozu ince kıyın\n3. Karıştırın\n4. Zeytinyağı, limon ve nar ekşisi ekleyin\n5. Servis edin',
+                'category_slug': 'salatalar',
+                'prep_time': 15,
+                'cook_time': 0,
+                'servings': 4
+            },
+            {
+                'title': 'Kısır',
+                'content': 'Bulgurla yapılan geleneksel Türk salatası. Nar ekşisi ve salça ile tatlandırılmış nefis bir tarif.',
+                'ingredients': '2 su bardağı ince bulgur\n1 su bardağı sıcak su\n2 yemek kaşığı salça\nNar ekşisi\nMaydanoz, domates, soğan\nBaharat',
+                'instructions': '1. Bulguru sıcak suyla ıslatın\n2. Salçayı ekleyin\n3. Sebzeleri doğrayın\n4. Tüm malzemeleri karıştırın\n5. Dinlendirip servis edin',
+                'category_slug': 'salatalar',
+                'prep_time': 30,
+                'cook_time': 0,
+                'servings': 6
+            },
+            {
+                'title': 'Piyaz',
+                'content': 'Fasulye salatası. Antalya\'nın meşhur salatası haşlanmış fasulye, tahin ve yumurtayla hazırlanır.',
+                'ingredients': '2 su bardağı kuru fasulye\n2 adet yumurta\n2 yemek kaşığı tahin\nSoğan, maydanoz\nZeytinyağı, limon',
+                'instructions': '1. Fasulyeyi haşlayın\n2. Yumurtaları haşlayın\n3. Soğanları doğrayın\n4. Tahin sosunu hazırlayın\n5. Karıştırıp servis edin',
+                'category_slug': 'salatalar',
+                'prep_time': 20,
+                'cook_time': 60,
+                'servings': 4
+            },
+            # Dünya Mutfağı
+            {
+                'title': 'Spaghetti Carbonara',
+                'content': 'İtalyan mutfağının klasik makarna tarifi. Yumurta, pancetta ve parmesan peyniriyle hazırlanan kremalı lezzet.',
+                'ingredients': '400g spagetti\n200g pancetta\n4 adet yumurta\n100g parmesan peyniri\nTuz, karabiber',
+                'instructions': '1. Makarnayı haşlayın\n2. Pancettayı kızartın\n3. Yumurta ve peyniri çırpın\n4. Makarnayı karıştırın\n5. Hemen servis edin',
+                'category_slug': 'dunya-mutfagi',
+                'prep_time': 10,
+                'cook_time': 20,
+                'servings': 4
+            },
+            {
+                'title': 'Pad Thai',
+                'content': 'Tayland\'ın ünlü pirinç eriştesi. Karides, yer fıstığı ve tamarind sosuyla hazırlanan egzotik tarif.',
+                'ingredients': '300g pirinç eriştesi\n200g karides\nYumurta\nYer fıstığı\nTamarind, balık sosu, limon',
+                'instructions': '1. Erişteyyi ıslatın\n2. Karidesi pişirin\n3. Yumurtayı karıştırın\n4. Sosları ekleyin\n5. Yer fıstığıyla servis edin',
+                'category_slug': 'dunya-mutfagi',
+                'prep_time': 15,
+                'cook_time': 15,
+                'servings': 3
+            },
+            {
+                'title': 'Tacos',
+                'content': 'Meksika mutfağının vazgeçilmez yemeği. Tortilla ekmeğinde kıyma, sebze ve soslarla hazırlanan lezzetli tarif.',
+                'ingredients': '500g kıyma\n8 adet tortilla\nMarul, domates\nAvokado\nSalsa sosu, krema',
+                'instructions': '1. Kıymayı baharatlarla pişirin\n2. Tortillaları ısıtın\n3. Sebzeleri doğrayın\n4. Tortillaya malzemeleri yerleştirin\n5. Soslarla servis edin',
+                'category_slug': 'dunya-mutfagi',
+                'prep_time': 20,
+                'cook_time': 15,
+                'servings': 4
+            },
+        ]
+        
+        # Get admin user for recipe creation
+        admin = User.query.filter_by(username='admin').first()
+        if admin:
+            for recipe_data in sample_recipes:
+                # Get category by slug
+                category = Category.query.filter_by(slug=recipe_data['category_slug']).first()
+                if category:
+                    # Check if recipe already exists
+                    existing_recipe = Recipe.query.filter_by(
+                        title=recipe_data['title'],
+                        category_id=category.id
+                    ).first()
+                    
+                    if not existing_recipe:
+                        recipe = Recipe(
+                            title=recipe_data['title'],
+                            content=recipe_data['content'],
+                            ingredients=recipe_data['ingredients'],
+                            instructions=recipe_data['instructions'],
+                            category_id=category.id,
+                            user_id=admin.id,
+                            prep_time=recipe_data.get('prep_time'),
+                            cook_time=recipe_data.get('cook_time'),
+                            servings=recipe_data.get('servings')
+                        )
+                        db.session.add(recipe)
+                        print(f'✓ Recipe added: {recipe_data["title"]}')
+            
+            db.session.commit()
+        
         print('✓ Database initialization complete!')
         
     except Exception as e:
