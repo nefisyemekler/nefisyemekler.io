@@ -48,6 +48,13 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
     position: relative;
     overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Gap utility */
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 1rem !important; }
+.g-4 { gap: 1.5rem !important; }
 }
 
 /* Animated Background Particles */

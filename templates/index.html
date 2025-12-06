@@ -6,19 +6,18 @@
 <!-- Hero Section -->
 <section class="hero-section text-white py-5">
     <div class="container text-center">
-        <h1 class="display-4 mb-3 hero-title animate-fade-in">Nefis Yemekler'e Hoş Geldiniz!</h1>
-        <p class="lead mb-4 animate-fade-in-delay">En lezzetli tarifleri keşfedin ve kendi tariflerinizi paylaşın</p>
+        <h1 class="display-4 mb-3 hero-title animate-fade-in">Nefis Yemekler</h1>
+        <p class="lead mb-4 animate-fade-in-delay">Lezzetli tarifleri keşfedin ve paylaşın</p>
         
-        <!-- Büyük Arama Kutusu -->
+        <!-- Arama Kutusu -->
         <div class="row justify-content-center mb-4">
-            <div class="col-md-8 col-lg-6">
-                <form action="{{ url_for('search') }}" method="GET" class="search-form-hero">
-                    <div class="input-group input-group-lg shadow">
-                        <input type="search" name="q" class="form-control form-control-lg" 
-                               placeholder="Tarif ara... (örn: tavuk, çorba, pasta)" 
-                               aria-label="Search"
+            <div class="col-md-7 col-lg-6">
+                <form action="{{ url_for('search') }}" method="GET">
+                    <div class="input-group shadow">
+                        <input type="search" name="q" class="form-control" 
+                               placeholder="Tarif ara..." 
                                value="{{ request.args.get('q', '') }}">
-                        <button class="btn btn-warning btn-lg px-4" type="submit">
+                        <button class="btn btn-warning" type="submit">
                             <i class="fas fa-search"></i> Ara
                         </button>
                     </div>
@@ -26,89 +25,95 @@
             </div>
         </div>
         
-        {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
-            <i class="fas fa-user-plus"></i> Hemen Üye Ol
-        </a>
-        {% else %}
-        <a href="{{ url_for('add_recipe') }}" class="btn btn-light btn-lg">
-            <i class="fas fa-plus-circle"></i> Tarif Ekle
-        </a>
-        {% endif %}
+        <!-- Hızlı Butonlar -->
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-light">
+                <i class="fas fa-user-plus"></i> Üye Ol
+            </a>
+            {% else %}
+            <a href="{{ url_for('add_recipe') }}" class="btn btn-light">
+                <i class="fas fa-plus-circle"></i> Tarif Ekle
+            </a>
+            {% endif %}
+            <a href="{{ url_for('ai_recipe') }}" class="btn btn-success">
+                <i class="fas fa-robot"></i> AI Tarif Önerisi
+            </a>
+            <a href="{{ url_for('calorie_calculator') }}" class="btn btn-info">
+                <i class="fas fa-calculator"></i> Kalori Hesapla
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- Categories Section -->
-<section class="categories-section py-5">
+<!-- Kategoriler - Kompakt -->
+<section class="py-4 bg-light">
     <div class="container">
-        <h2 class="text-center mb-5 section-title">Kategoriler</h2>
-        <div class="row">
+        <h5 class="mb-3"><i class="fas fa-list"></i> Kategoriler</h5>
+        <div class="d-flex flex-wrap gap-2">
             {% for category in categories %}
-            <div class="col-md-4 col-sm-6 mb-3">
-                <a href="{{ url_for('category', slug=category.slug) }}" class="text-decoration-none">
-                    <div class="card h-100 category-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ category.name }}</h5>
-                            <p class="card-text text-muted">{{ category.description }}</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <a href="{{ url_for('category', slug=category.slug) }}" 
+               class="btn btn-outline-primary btn-sm">
+                {{ category.name }}
+            </a>
             {% endfor %}
         </div>
     </div>
 </section>
 
-<!-- Recipes Section -->
-<section class="recipes-section py-5">
+<!-- Tarifler -->
+<section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5 section-title">En Yeni Tarifler</h2>
-        <div class="row">
+        <h2 class="mb-4"><i class="fas fa-fire"></i> En Yeni Tarifler</h2>
+        
+        {% if recipes %}
+        <div class="row g-4">
             {% for recipe in recipes %}
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 recipe-card">
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card h-100 recipe-card shadow-sm">
                     {% if recipe.image %}
                     <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
-                         class="card-img-top" alt="{{ recipe.title }}" style="height: 200px; object-fit: cover;">
+                         class="card-img-top" alt="{{ recipe.title }}" style="height: 180px; object-fit: cover;">
                     {% else %}
                     <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
-                         style="height: 200px;">
+                         style="height: 180px;">
                         <i class="fas fa-utensils fa-3x text-white"></i>
                     </div>
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ recipe.title }}</h5>
-                        <p class="card-text">{{ recipe.content[:100] }}...</p>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title mb-2">{{ recipe.title }}</h6>
+                        <div class="mb-2">
                             <span class="badge bg-primary">{{ recipe.category.name }}</span>
-                            <span class="text-warning">
-                                {% set rating = recipe.average_rating() %}
-                                {% for i in range(5) %}
-                                    {% if i < rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </span>
                         </div>
                         <div class="text-muted small mb-2">
+                            {% if recipe.prep_time or recipe.cook_time %}
                             <i class="fas fa-clock"></i> 
-                            {% if recipe.prep_time %}{{ recipe.prep_time }} dk{% endif %}
-                            {% if recipe.cook_time %} + {{ recipe.cook_time }} dk{% endif %}
-                            {% if recipe.servings %} | {{ recipe.servings }} kişilik{% endif %}
+                            {% if recipe.prep_time %}{{ recipe.prep_time }}{% endif %}{% if recipe.cook_time %}+{{ recipe.cook_time }}{% endif %} dk
+                            {% endif %}
+                            {% if recipe.servings %}
+                            | <i class="fas fa-users"></i> {{ recipe.servings }} kişi
+                            {% endif %}
+                        </div>
+                        <div class="text-warning small mb-2">
+                            {% set rating = recipe.average_rating() %}
+                            {% for i in range(5) %}
+                                {% if i < rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                         <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" 
-                           class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i> Tarifi Gör
+                           class="btn btn-primary btn-sm mt-auto">
+                            <i class="fas fa-eye"></i> Görüntüle
                         </a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        
-        {% if not recipes %}
+        {% else %}
         <div class="alert alert-info text-center">
             <i class="fas fa-info-circle"></i> Henüz tarif eklenmemiş.
         </div>
