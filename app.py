@@ -35,6 +35,14 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Lütfen giriş yapın.'
 
+# Create tables on startup (for production)
+with app.app_context():
+    try:
+        db.create_all()
+        print('✓ Database tables created/verified')
+    except Exception as e:
+        print(f'✗ Database error: {e}')
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
