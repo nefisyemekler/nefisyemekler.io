@@ -72,7 +72,7 @@
                         {% if recipe.ingredients %}
                             {% for line in recipe.ingredients.split('\n') %}
                             {% if line.strip() %}
-                            <li class="list-group-item bg-transparent text-light border-secondary">
+                            <li class="list-group-item bg-transparent text-light border-secondary ps-0">
                                 <i class="fas fa-circle text-primary me-2" style="font-size: 6px; vertical-align: middle;"></i>
                                 {{ line }}
                             </li>
@@ -83,38 +83,39 @@
                 </div>
             </div>
 
-            <div class="glass-card p-4">
-                <h4 class="text-white fw-bold mb-4">Yorumlar ({{ comments|length }})</h4>
+            <div class="glass-card p-3">
+                <h5 class="text-white fw-bold mb-3">Yorumlar ({{ comments|length }})</h5>
                 
                 {% if current_user.is_authenticated %}
-                <form method="POST" action="{{ url_for('add_comment', recipe_id=recipe.id) }}" class="mb-4">
-                    <textarea name="body" class="form-control mb-3" rows="3" placeholder="Tarif hakkında ne düşünüyorsun?" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);"></textarea>
+                <form method="POST" action="{{ url_for('add_comment', recipe_id=recipe.id) }}" class="mb-3">
+                    <textarea name="body" class="form-control mb-2" rows="2" placeholder="Tarif hakkında ne düşünüyorsun?" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);"></textarea>
+                    
                     <div class="d-flex justify-content-between align-items-center">
-                        <select name="rating" class="form-select w-auto form-select-sm" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);">
+                        <select name="rating" class="form-select form-select-sm w-auto py-1" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);">
                             <option value="5">⭐⭐⭐⭐⭐ Mükemmel</option>
                             <option value="4">⭐⭐⭐⭐ Çok İyi</option>
                             <option value="3">⭐⭐⭐ İyi</option>
                             <option value="2">⭐⭐ Orta</option>
                             <option value="1">⭐ Kötü</option>
                         </select>
-                        <button type="submit" class="btn btn-primary-glow px-4 rounded-pill">Yorum Yap</button>
+                        <button type="submit" class="btn btn-primary-glow px-3 py-1 rounded-pill btn-sm">Yorum Yap</button>
                     </div>
                 </form>
                 {% else %}
-                <div class="alert alert-info bg-opacity-25 border-0 text-white">Yorum yapmak için <a href="{{ url_for('login') }}" class="text-primary fw-bold">giriş yapın</a>.</div>
+                <div class="alert alert-info bg-opacity-25 border-0 text-white py-2 small">Yorum yapmak için <a href="{{ url_for('login') }}" class="text-primary fw-bold">giriş yapın</a>.</div>
                 {% endif %}
 
                 {% for comment in comments %}
-                <div class="d-flex gap-3 mb-3 pb-3 border-bottom border-secondary">
-                    <div class="bg-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                <div class="d-flex gap-3 mb-2 pb-2 border-bottom border-secondary">
+                    <div class="bg-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 35px; height: 35px;">
                         {{ comment.user.username[0]|upper }}
                     </div>
                     <div>
                         <div class="d-flex align-items-center gap-2">
-                            <h6 class="mb-0 fw-bold text-white">{{ comment.user.username }}</h6>
-                            <span class="text-warning small">{% for i in range(comment.rating or 0) %}<i class="fas fa-star"></i>{% endfor %}</span>
+                            <h6 class="mb-0 fw-bold text-white small">{{ comment.user.username }}</h6>
+                            <span class="text-warning" style="font-size: 0.7rem;">{% for i in range(comment.rating or 0) %}<i class="fas fa-star"></i>{% endfor %}</span>
                         </div>
-                        <p class="text-muted small mb-0 mt-1">{{ comment.body }}</p>
+                        <p class="text-muted small mb-0">{{ comment.body }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -123,20 +124,25 @@
 
         <div class="col-lg-5">
             <div class="glass-card p-0 overflow-hidden h-100">
-                <div class="p-3 bg-success bg-opacity-25 border-bottom border-success border-opacity-25">
+                <div class="p-3 bg-success bg-opacity-25 border-bottom border-success border-opacity-25 d-flex justify-content-between align-items-center">
                     <h4 class="mb-0 text-success fw-bold"><i class="fas fa-tasks me-2"></i>Yapılışı</h4>
+                    
+                    <button onclick="openFocusMode()" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">
+                        <i class="fas fa-play me-1"></i> Pişirme Modu
+                    </button>
                 </div>
-                <div class="p-4">
+                
+                <div class="p-4" id="instructionList">
                     {% if recipe.instructions %}
                         {% for line in recipe.instructions.split('\n') %}
                         {% if line.strip() %}
-                        <div class="d-flex gap-3 mb-4">
+                        <div class="d-flex gap-3 mb-4 step-item">
                             <div class="flex-shrink-0">
                                 <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow" style="width: 32px; height: 32px;">
                                     {{ loop.index }}
                                 </span>
                             </div>
-                            <p class="text-light mb-0 pt-1">{{ line }}</p>
+                            <p class="text-light mb-0 pt-1 step-text">{{ line }}</p>
                         </div>
                         {% endif %}
                         {% endfor %}
@@ -152,4 +158,110 @@
         </div>
     </div>
 </div>
+
+<div id="focusModeOverlay" class="focus-mode-overlay d-none">
+    <button class="btn-close-focus" onclick="closeFocusMode()" title="Kapat">
+        <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
+        <h6 class="text-muted text-uppercase letter-spacing-2 mb-5">Adım <span id="currentStepNum" class="text-primary fw-bold fs-4">1</span> / <span id="totalSteps">5</span></h6>
+        
+        <div id="stepContent" class="display-4 fw-bold text-white mb-5 step-text-anim" style="max-width: 900px; line-height: 1.4;">
+            </div>
+
+        <div class="d-flex gap-4 align-items-center mt-4">
+            <button class="btn btn-outline-light rounded-circle focus-nav-btn p-3" onclick="prevStep()" style="width: 60px; height: 60px;">
+                <i class="fas fa-arrow-left fa-lg"></i>
+            </button>
+            
+            <button class="btn btn-primary-glow rounded-pill px-5 py-3 fs-4 focus-nav-btn" onclick="nextStep()" id="nextBtn">
+                Sonraki Adım <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let steps = [];
+    let currentStep = 0;
+
+    // Sayfa yüklendiğinde talimatları topla
+    document.addEventListener('DOMContentLoaded', function() {
+        const stepElements = document.querySelectorAll('#instructionList .step-text');
+        steps = Array.from(stepElements).map(el => el.innerText.trim());
+    });
+
+    function openFocusMode() {
+        if (steps.length === 0) return alert("Gösterilecek adım bulunamadı.");
+        
+        currentStep = 0;
+        updateFocusContent();
+        
+        const overlay = document.getElementById('focusModeOverlay');
+        overlay.classList.remove('d-none');
+        document.body.style.overflow = 'hidden'; // Arka plan scroll'unu kilitle
+    }
+
+    function closeFocusMode() {
+        const overlay = document.getElementById('focusModeOverlay');
+        overlay.classList.add('d-none');
+        document.body.style.overflow = 'auto'; // Scroll'u aç
+    }
+
+    function updateFocusContent() {
+        const contentDiv = document.getElementById('stepContent');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        // İçeriği güncelle
+        contentDiv.innerText = steps[currentStep];
+        document.getElementById('currentStepNum').innerText = currentStep + 1;
+        document.getElementById('totalSteps').innerText = steps.length;
+        
+        // Animasyonu yeniden tetikle (Silip tekrar ekleyerek)
+        contentDiv.classList.remove('step-text-anim');
+        void contentDiv.offsetWidth; // Reflow tetikle
+        contentDiv.classList.add('step-text-anim');
+
+        // Son adımda buton metnini değiştir
+        if (currentStep === steps.length - 1) {
+            nextBtn.innerHTML = 'Bitir <i class="fas fa-check ms-2"></i>';
+            nextBtn.classList.replace('btn-primary-glow', 'btn-success');
+        } else {
+            nextBtn.innerHTML = 'Sonraki Adım <i class="fas fa-arrow-right ms-2"></i>';
+            nextBtn.classList.replace('btn-success', 'btn-primary-glow');
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            updateFocusContent();
+        } else {
+            closeFocusMode(); // Son adımdaysa kapat
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            updateFocusContent();
+        }
+    }
+
+    // Klavye Kontrolü (Sağ/Sol Ok Tuşları)
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('focusModeOverlay').classList.contains('d-none')) return;
+        
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault(); // Boşluk tuşu sayfayı kaydırmasın
+            nextStep();
+        }
+        if (e.key === 'ArrowLeft') prevStep();
+        if (e.key === 'Escape') closeFocusMode();
+    });
+</script>
 {% endblock %}

@@ -1,53 +1,58 @@
 {% extends "base.html" %}
-{% block title %}AI Şef - Nefis Yemekler{% endblock %}
+
+{% block title %}Tarif Düzenle - Nefis Yemekler{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="text-center mb-5">
-                <span class="badge bg-primary-glow mb-2"><i class="fas fa-robot me-1"></i> Yapay Zeka Destekli</span>
-                <h1 class="display-4 fw-bold" style="font-family: 'Playfair Display', serif;">AI Mutfak Asistanı</h1>
-                <p class="text-muted">Dolabındaki malzemeleri söyle, sana özel gurme tarifler hazırlayalım.</p>
-            </div>
-
-            <div class="glass-card p-4 p-md-5 mb-5">
-                <form method="POST">
-                    <div class="mb-4">
-                        <label class="form-label h5 text-light"><i class="fas fa-carrot text-warning me-2"></i>Elinizdeki Malzemeler</label>
-                        <textarea class="form-control" name="ingredients" rows="4" placeholder="Örn: 2 yumurta, biraz domates, bayat ekmek, kaşar peyniri..." required></textarea>
-                        <div class="form-text text-muted">Malzemeleri virgülle ayırarak yazabilirsiniz.</div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label h5 text-light"><i class="fas fa-sliders-h text-info me-2"></i>Tercihler (Opsiyonel)</label>
-                        <input type="text" class="form-control" name="preferences" placeholder="Örn: Acı olmasın, 15 dakikada hazırlansın, diyet olsun...">
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary-glow py-3 fw-bold">
-                            <i class="fas fa-magic me-2"></i> Sihirli Tarifi Oluştur
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            {% if recipe_suggestion %}
-            <div class="glass-card border-success p-4 p-md-5 position-relative overflow-hidden">
-                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(29, 209, 161, 0.2) 0%, transparent 70%);"></div>
-
-                <div class="text-center mb-4">
-                    <h2 class="text-success fw-bold" style="font-family: 'Playfair Display', serif;">{{ recipe_suggestion.title }}</h2>
-                    <p class="text-light fst-italic">"{{ recipe_suggestion.description }}"</p>
+        <div class="col-lg-9">
+            <div class="glass-card p-0 p-md-5">
+                <div class="text-center mb-5">
+                    <span class="badge bg-warning bg-opacity-25 text-warning mb-2 px-3 py-2 rounded-pill border border-warning border-opacity-25">
+                        <i class="fas fa-edit me-1"></i> Düzenleme
+                    </span>
+                    <h2 class="fw-bold mt-2" style="font-family: 'Playfair Display', serif;">Tarif Düzenle</h2>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="p-3 rounded-3 h-100" style="background: rgba(255,255,255,0.03);">
-                            <h5 class="text-warning mb-3"><i class="fas fa-list-ul me-2"></i>Malzemeler</h5>
-                            <ul class="text-muted small mb-0 ps-3">
-                                {% for item in recipe_suggestion.ingredients %}
-                                <li>{{ item }}</li>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Tarif Adı</label>
+                            <input type="text" class="form-control form-control-lg" name="title" value="{{ recipe.title }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Kategori</label>
+                            <select class="form-select" name="category_id" required>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if recipe.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Yeni Fotoğraf</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
+                            {% if recipe.image %}
+                            <div class="form-text text-muted">Mevcut: {{ recipe.image }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Kısa Açıklama</label>
+                            <textarea class="form-control" name="content" rows="2" required>{{ recipe.content }}</textarea>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-clock text-warning me-1"></i> Hazırlık (Dk)</label>
+                            <input type="number" class="form-control text-center" name="prep_time" value="{{ recipe.prep_time or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-fire text-danger me-1"></i> Pişirme (Dk)</label>
+                            <input type="number" class="form-control text-center" name="cook_time" value="{{ recipe.cook_time or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-users text-info me-1"></i> Porsiyon</label>
+                            <input type="number" class="form-control text-center" name="servings" value="{{ recipe.servings or '' }}">
                                 {% endfor %}
                             </ul>
                         </div>

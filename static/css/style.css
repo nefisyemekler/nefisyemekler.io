@@ -20,8 +20,10 @@ body {
     color: var(--text-main);
     font-family: 'Poppins', sans-serif;
     overflow-x: hidden;
-    position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
+    margin: 0;
 }
 
 /* --- ARKA PLAN EFEKTLERİ (Yüzen Işıklar) --- */
@@ -49,6 +51,12 @@ body::after {
 @keyframes floatBg {
     0% { transform: translate(0, 0); }
     100% { transform: translate(30px, 30px); }
+}
+
+/* --- ANA İÇERİK ALANI (Main) --- */
+main {
+    flex: 1;
+    width: 100%;
 }
 
 /* --- GLASSMORPHISM NAVBAR --- */
@@ -136,8 +144,12 @@ body::after {
 
 /* Yüzen Yemek Resmi Animasyonu */
 .floating-plate {
-    width: 100%;
-    max-width: 500px;
+    border-radius: 50% !important;
+    width: 450px;      
+    height: 450px;     
+    object-fit: cover;
+    background-color: transparent; 
+    box-shadow: 0 0 50px rgba(0,0,0,0.5); 
     animation: floatPlate 6s ease-in-out infinite;
     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
 }
@@ -148,10 +160,10 @@ body::after {
 
 /* --- GLASS CARDS (TARİF KARTLARI) --- */
 .glass-card {
-    background: var(--glass-bg);
+    background: rgba(15, 23, 42, 0.6); /* Daha koyu ve okunaklı zemin */
+    backdrop-filter: blur(15px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    backdrop-filter: blur(5px);
     overflow: hidden;
     transition: 0.4s ease;
     height: 100%;
@@ -199,6 +211,14 @@ body::after {
     color: #94a3b8 !important;
 }
 
+/* Kartlardaki Resimlerin Beyaz Köşelerini Kesme */
+.card-img-wrapper img,
+.glass-card img {
+    /* İsteğe bağlı: Kart içindeki resimleri de yuvarlak yapmak istersen burayı aç */
+    /* border-radius: 50%; aspect-ratio: 1/1; */
+    object-fit: cover;
+}
+
 /* Butonlar */
 .btn-primary-glow {
     background: linear-gradient(45deg, var(--primary), #ff6b6b);
@@ -231,18 +251,12 @@ body::after {
 }
 .glass-search::placeholder { color: rgba(255,255,255,0.5); }
 
-/* Footer */
-footer {
-    border-top: 1px solid var(--glass-border);
-    background: rgba(0,0,0,0.2) !important;
-    margin-top: 5rem;
-}
 /* --- FORM ELEMANLARI (Cam Görünüm) --- */
 .form-control, .form-select, .input-group-text {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     color: white !important;
-    border-radius: 15px; /* Yuvarlak hatlar */
+    border-radius: 15px;
     padding: 12px 20px;
     backdrop-filter: blur(5px);
 }
@@ -250,13 +264,12 @@ footer {
 .form-control:focus, .form-select:focus {
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: var(--primary) !important;
-    box-shadow: 0 0 20px rgba(255, 159, 67, 0.2); /* Turuncu parlama */
+    box-shadow: 0 0 20px rgba(255, 159, 67, 0.2);
 }
 
-/* Placeholder (İpucu yazısı) rengi */
 .form-control::placeholder { color: rgba(255, 255, 255, 0.4); }
 
-/* Tablolar (Admin paneli vb. için) */
+/* Tablolar */
 .table { color: var(--text-muted); border-color: var(--glass-border); }
 .table th { color: var(--text-main); font-family: 'Playfair Display', serif; }
 
@@ -268,35 +281,28 @@ body.dark-mode {
     --text-muted: #6b7280;
 }
 
-body.dark-mode::before {
-    background: rgba(255, 159, 67, 0.08);
-}
+body.dark-mode::before { background: rgba(255, 159, 67, 0.08); }
+body.dark-mode::after { background: rgba(29, 209, 161, 0.06); }
 
-body.dark-mode::after {
-    background: rgba(29, 209, 161, 0.06);
-}
-
-#darkModeToggle {
-    transition: all 0.3s ease;
-}
-
+#darkModeToggle { transition: all 0.3s ease; }
 #darkModeToggle:hover {
     background: var(--primary) !important;
     border-color: var(--primary) !important;
     transform: scale(1.1);
 }
-/* --- MODERN FOOTER --- */
+
+/* --- MODERN FOOTER (Düzeltilmiş) --- */
 .glass-footer {
-    background: rgba(15, 23, 42, 0.95); /* Çok koyu, neredeyse opak lacivert */
-    backdrop-filter: blur(20px); /* Arkadaki desenleri bulanıklaştır */
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Üstüne ince parlak çizgi */
+    flex-shrink: 0; /* Footer'ın sıkışmasını önle */
+    background: #0f172a; /* Koyu zemin (Arkayı göstermez) */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
-    z-index: 10; /* İçeriğin üstünde kalsın */
-    margin-top: 5rem; /* İçerikten uzaklaştır */
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5); /* Yukarı doğru gölge */
+    z-index: 10;
+    width: 100%;
+    margin-top: auto; /* Kendini en alta yasla */
+    padding-top: 3rem;
 }
 
-/* Linkler */
 .footer-link {
     color: var(--text-muted);
     text-decoration: none;
@@ -306,10 +312,9 @@ body.dark-mode::after {
 
 .footer-link:hover {
     color: var(--primary);
-    transform: translateX(5px); /* Üzerine gelince sağa kaysın */
+    transform: translateX(5px);
 }
 
-/* Sosyal Medya Butonları */
 .social-btn {
     width: 40px;
     height: 40px;
@@ -331,93 +336,71 @@ body.dark-mode::after {
     box-shadow: 0 5px 15px rgba(255, 159, 67, 0.4);
 }
 
-/* Sayfa kısa olsa bile footer en altta kalsın */
-body {
+/* --- FOOTER FINAL --- */
+footer, .glass-footer {
+    flex-shrink: 0;
+    background: #0f172a;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 100%;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    padding: 3rem 0;
+    margin-top: 500px;
+}
+/* --- ODAK MODU (PİŞİRME EKRANI) --- */
+.focus-mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0f172a; /* Tamamen koyu zemin */
+    z-index: 9999; /* Her şeyin üstünde */
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: opacity 0.3s ease;
 }
-/* --- LAYOUT DÜZELTMESİ (Footer Çakışmasını Önle) --- */
 
-/* Sayfa yapısını dikey esnek kutu yap */
-body {
+/* Kapatma Butonu (Sağ Üst) */
+.btn-close-focus {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
     display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Ekranın tamamını kapla */
+    align-items: center;
+    justify-content: center;
+}
+.btn-close-focus:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
 }
 
-/* Ana içerik alanını genişleterek footer'ı aşağı it */
-main {
-    flex: 1 0 auto; /* Boş alanı doldur */
-    padding-bottom: 5rem; /* Footer ile içerik arasına ekstra güvenli boşluk */
+/* Adım Yazısı Animasyonu */
+.step-text-anim {
+    animation: slideUp 0.5s ease forwards;
 }
 
-/* Footer'ın ayarları */
-footer {
-    flex-shrink: 0; /* Footer'ın büzülmesini engelle */
-    margin-top: auto; /* Kendini en alta yasla */
-    position: relative; 
-    z-index: 10; /* İçeriğin üstünde (veya altında) düzgün katmanlan */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Yorumlar Kartını Biraz Daha Opak Yap (Yazı karışmasını engellemek için) */
-.glass-card {
-    background: rgba(15, 23, 42, 0.6); /* Daha koyu/opak bir zemin */
-    backdrop-filter: blur(15px); /* Daha güçlü buzlu cam efekti */
-    border: 1px solid rgba(255, 255, 255, 0.08);
+/* Navigasyon Butonları */
+.focus-nav-btn {
+    transition: 0.3s;
 }
-/* --- FOOTER SABİTLEME VE BOŞLUK AYARI --- */
-
-/* 1. Sayfanın tamamını kapsayan esnek yapı */
-html, body {
-    height: 100%; /* Sayfa boyunu garantiye al */
-    margin: 0;
-}
-
-body {
-    display: flex;
-    flex-direction: column; /* Alt alta dizilim */
-    min-height: 100vh; /* En az ekran boyu kadar olsun */
-}
-
-/* 2. İçerik alanını (Main) büyütüp Footer'ı itmesi */
-main {
-    flex: 1 0 auto; /* Boş alanı doldurarak footer'ı aşağı iter */
-    padding-bottom: 250px; /* Footer ile içerik arasına güvenli boşluk */
-    width: 100%; /* Genişliği koru */
-}
-
-/* 3. Footer'ın duruşu */
-footer {
-    flex-shrink: 0; /* Footer'ın sıkışmasını engelle */
-    margin-top: auto; /* Kendini en alta yasla */
-    position: relative; 
-    z-index: 10; /* Diğer öğelerin üstünde/altında doğru katmanda dur */
-}
-
-/* Eğer footer hala çok yakın geliyorsa margin değerini artırabilirsin */
-.glass-footer {
-    margin-top: 5rem !important; /* İçerikten ekstra uzaklaştır */
-}
-/* --- RESİM DÜZELTMESİ (Beyaz Kenarları Kesme) --- */
-
-/* Hero Bölümündeki ve Kartlardaki Yemek Resimleri İçin */
-.floating-plate, 
-.card-img-wrapper img,
-.glass-card img {
-    border-radius: 50%; /* Resmi tam daire yapar */
-    aspect-ratio: 1 / 1; /* En ve boyu eşitler (kare/daire olmasını garantiler) */
-    object-fit: cover; /* Resmin daire içine sündürülmeden oturmasını sağlar */
-    border: 4px solid rgba(255, 255, 255, 0.1); /* Etrafına şık, ince bir çerçeve ekler */
-}
-
-/* Eğer dikdörtgen (kart) resimlerin yuvarlak olmasını istemiyorsan,
-   sadece Hero (ana sayfa üst kısım) resmini yuvarlak yapmak için bunu kullan: */
-.floating-plate {
-    border-radius: 50% !important;
-    width: 450px;      /* Sabit genişlik verelim ki tam daire olsun */
-    height: 450px;     /* Yükseklik genişlikle aynı olmalı */
-    object-fit: cover;
-    background-color: transparent; /* Arka planı şeffaf yap */
-    box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Derinlik katar */
+.focus-nav-btn:hover {
+    transform: scale(1.1);
 }
