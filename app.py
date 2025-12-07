@@ -664,15 +664,19 @@ def edit_recipe(recipe_id):
         recipe.cook_time = request.form.get('cook_time', type=int)
         recipe.servings = request.form.get('servings', type=int)
         
-        # Fotoğraf güncelleme - URL veya dosya yükleme
-        image_url = request.form.get('image_url', '').strip()
-        
-        if image_url:
-            # URL girilmişse direkt kullan
-            recipe.image = image_url
-        elif 'image' in request.files:
-            # Dosya yüklenmişse kaydet
-            file = request.files['image']
+        # Fotoğraf silme kontrolü
+        if request.form.get('remove_image'):
+            recipe.image = None
+        else:
+            # Fotoğraf güncelleme - URL veya dosya yükleme
+            image_url = request.form.get('image_url', '').strip()
+            
+            if image_url:
+                # URL girilmişse direkt kullan
+                recipe.image = image_url
+            elif 'image' in request.files:
+                # Dosya yüklenmişse kaydet
+                file = request.files['image']
             if file and file.filename and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
