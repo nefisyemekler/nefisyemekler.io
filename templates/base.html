@@ -28,9 +28,8 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Ana Sayfa</a></li>
                     
-                    <!-- Kategoriler Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-th-large me-1"></i> Kategoriler
                         </a>
                         <ul class="dropdown-menu dropdown-menu-categories bg-dark border-secondary" data-bs-theme="dark">
@@ -48,7 +47,6 @@
                         </ul>
                     </li>
                     
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ai_recipe') }}"><i class="fas fa-robot me-1"></i> AI Şef</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('calorie_calculator') }}"><i class="fas fa-calculator me-1"></i> Kalori</a></li>
                     
                     {% if current_user.is_authenticated %}
@@ -80,24 +78,25 @@
         </div>
     </nav>
 
-    <div class="container" style="margin-top: 80px; padding-top: 20px;">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="background: rgba(255,255,255,0.9);">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
-
     <main>
+        
+        <div class="container" style="margin-top: 100px;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="background: rgba(255,255,255,0.9);">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
         {% block content %}{% endblock %}
     </main>
 
-<footer class="glass-footer text-white mt-auto">
+    <footer class="glass-footer text-white py-5">
         <div class="container py-5">
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
@@ -105,7 +104,7 @@
                         <i class="fas fa-utensils me-2 text-primary"></i>Nefis Yemekler
                     </h4>
                     <p class="text-muted small">
-                        Yapay zeka destekli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Lezzet sanatını keşfedin.
+                        En lezzetli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Lezzet sanatını keşfedin.
                     </p>
                 </div>
 
@@ -113,7 +112,6 @@
                     <h5 class="fw-bold mb-3 text-light">Hızlı Erişim</h5>
                     <ul class="list-unstyled text-muted small">
                         <li class="mb-2"><a href="{{ url_for('index') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>Ana Sayfa</a></li>
-                        <li class="mb-2"><a href="{{ url_for('ai_recipe') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>AI Şef</a></li>
                         <li class="mb-2"><a href="{{ url_for('calorie_calculator') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>Kalori Hesapla</a></li>
                         <li class="mb-2"><a href="{{ url_for('contact') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>İletişim</a></li>
                     </ul>
@@ -132,7 +130,7 @@
             </div>
         </div>
 
-        <div class="footer-bottom py-3 text-center border-top border-secondary border-opacity-25">
+        <div class="py-3 text-center border-top border-secondary border-opacity-25">
             <small class="text-muted">&copy; 2025 Nefis Yemekler. Tüm hakları saklıdır.</small>
         </div>
     </footer>

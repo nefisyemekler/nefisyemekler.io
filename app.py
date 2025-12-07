@@ -406,135 +406,11 @@ def search():
     categories = Category.query.all()
     return render_template('search.html', recipes=recipes, query=query, categories=categories)
 
-@app.route('/ai-recipe', methods=['GET', 'POST'])
-def ai_recipe():
-    """AI ile tarif önerisi - Google Gemini kullanarak"""
-    if request.method == 'POST':
-        ingredients = request.form.get('ingredients', '').strip()
-        preferences = request.form.get('preferences', '').strip()
-        
-        if not ingredients:
-            flash('Lütfen malzemeleri girin.', 'danger')
-            return redirect(url_for('ai_recipe'))
-        
-        try:
-            # Google Gemini API key kontrolü
-            api_key = os.getenv('GEMINI_API_KEY')
-            if not api_key:
-                return render_template('ai_recipe.html', 
-                    error='Google Gemini API key bulunamadı. Lütfen .env dosyasına GEMINI_API_KEY ekleyin.')
-            
-            # Prompt hazırla
-            prompt = f"""Sen bir uzman aşçısın. Aşağıdaki malzemeler ile yapılabilecek lezzetli bir Türk yemeği tarifi öner.
-
-Malzemeler: {ingredients}
-"""
-            if preferences:
-                prompt += f"Tercihler: {preferences}\n"
-            
-            prompt += """
-Lütfen aşağıdaki JSON formatında bir tarif öner:
-{
-    "title": "Tarif adı",
-    "description": "Tarif hakkında kısa açıklama",
-    "ingredients": ["malzeme 1", "malzeme 2", ...],
-    "instructions": ["adım 1", "adım 2", ...],
-    "prep_time": hazırlık süresi (dakika),
-    "cook_time": pişirme süresi (dakika),
-    "servings": kaç kişilik
-}
-
-Sadece JSON formatında yanıt ver, başka açıklama ekleme."""
-
-            # Google Gemini API'ye istek gönder
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
-            
-            headers = {
-                'Content-Type': 'application/json'
-            }
-            
-            data = {
-                "contents": [{
-                    "parts": [{
-                        "text": prompt
-                    }]
-                }],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "maxOutputTokens": 2048
-                }
-            }
-            
-            response = requests.post(url, headers=headers, json=data, timeout=30)
-            
-            if response.status_code != 200:
-                return render_template('ai_recipe.html', 
-                    error=f'API hatası: {response.status_code} - {response.text}')
-            
-            result = response.json()
-            
-            # Gemini yanıtını parse et
-            if 'candidates' in result and len(result['candidates']) > 0:
-                candidate = result['candidates'][0]
-                
-                # Yanıt yapısını kontrol et
-                if 'content' not in candidate:
-                    return render_template('ai_recipe.html', 
-                        error='AI yanıt formatı hatalı. Lütfen tekrar deneyin.')
-                
-                if 'parts' not in candidate['content']:
-                    return render_template('ai_recipe.html', 
-                        error='AI yanıt formatı eksik. Lütfen tekrar deneyin.')
-                
-                recipe_text = candidate['content']['parts'][0]['text'].strip()
-                
-                # Debug için yanıtı yazdır
-                print("=== AI YANITI ===")
-                print(recipe_text)
-                print("=================")
-                
-                # JSON'u temizle (markdown kod bloklarını kaldır)
-                if '```json' in recipe_text:
-                    recipe_text = recipe_text.split('```json')[1].split('```')[0].strip()
-                elif '```' in recipe_text:
-                    recipe_text = recipe_text.split('```')[1].split('```')[0].strip()
-                
-                # Tek ve çift tırnakları düzelt
-                recipe_text = recipe_text.replace('\n', ' ').replace('\\n', ' ')
-                
-                print("=== TEMİZLENMİŞ JSON ===")
-                print(recipe_text)
-                print("========================")
-                
-                try:
-                    recipe_data = json.loads(recipe_text)
-                except json.JSONDecodeError as json_err:
-                    print(f"JSON PARSE HATASI: {json_err}")
-                    # Alternatif: regex ile JSON'u çıkar
-                    import re
-                    json_match = re.search(r'\{.*\}', recipe_text, re.DOTALL)
-                    if json_match:
-                        recipe_data = json.loads(json_match.group())
-                    else:
-                        return render_template('ai_recipe.html', 
-                            error=f'AI yanıtı düzgün JSON formatında değil. Lütfen tekrar deneyin.')
-                
-                return render_template('ai_recipe.html', recipe_suggestion=recipe_data)
-            else:
-                return render_template('ai_recipe.html', 
-                    error='AI yanıt üretemedi. Lütfen tekrar deneyin.')
-            
-        except json.JSONDecodeError as e:
-            return render_template('ai_recipe.html', 
-                error=f'AI yanıtı işlenirken hata oluştu. Lütfen tekrar deneyin.')
-        except requests.exceptions.RequestException as e:
-            return render_template('ai_recipe.html', 
-                error=f'Bağlantı hatası: {str(e)}')
-        except Exception as e:
-            return render_template('ai_recipe.html', 
-                error=f'Bir hata oluştu: {str(e)}')
-    
-    return render_template('ai_recipe.html')
+# AI Recipe route - Deactivated for security reasons
+# @app.route('/ai-recipe', methods=['GET', 'POST'])
+# def ai_recipe():
+#     """AI ile tarif önerisi - Google Gemini kullanarak"""
+#     pass
 
 @app.route('/calorie-calculator', methods=['GET', 'POST'])
 def calorie_calculator():
@@ -624,134 +500,17 @@ def calorie_calculator():
                 'goal': goal
             }
             
-            # 1 haftalık yeme programı oluştur
-            if request.form.get('generate_meal_plan'):
-                print("=== YEME PROGRAMI OLUŞTURULUYOR ===")
-                meal_plan = generate_weekly_meal_plan(result)
-                if meal_plan:
-                    result['meal_plan'] = meal_plan
-                    print("=== YEME PROGRAMI OLUŞTURULDU ===")
-                else:
-                    print("=== YEME PROGRAMI OLUŞTURULAMADI ===")
-                    flash('Yeme programı oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.', 'warning')
+            # AI ile yeme programı oluşturma devre dışı bırakıldı
+            # if request.form.get('generate_meal_plan'):
+            #     meal_plan = generate_weekly_meal_plan(result)
+            #     if meal_plan:
+            #         result['meal_plan'] = meal_plan
             
         except (ValueError, TypeError):
             flash('Lütfen tüm alanları doğru şekilde doldurun.', 'danger')
     
     return render_template('calorie_calculator.html', result=result)
 
-def generate_weekly_meal_plan(result):
-    """Gemini AI ile 1 haftalık yeme programı oluştur"""
-    try:
-        api_key = os.getenv('GEMINI_API_KEY')
-        if not api_key:
-            print("=== API KEY BULUNAMADI ===")
-            return None
-        
-        print(f"=== API KEY MEVCUT ===")
-        
-        # API endpoint - AI recipe ile aynı model
-        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}'
-        
-        # Prompt oluştur - BASİT versiyon
-        prompt = f"""
-{result['target_calories']} kalori hedefli 7 günlük Türk mutfağı menüsü oluştur.
-Protein: {result['protein_grams']}g, Karb: {result['carb_grams']}g, Yağ: {result['fat_grams']}g
-
-Her gün 5 öğün (Kahvaltı, Ara1, Öğle, Ara2, Akşam) KISA olarak belirt.
-
-JSON formatı (7 GÜN MUTLAKA):
-{{
-  "gunler": [
-    {{
-      "gun": "Pazartesi",
-      "ogunler": [
-        {{"ogun_adi": "Kahvaltı", "yemekler": ["Menemen", "Peynir"], "kalori": 350, "protein": 25, "karbonhidrat": 30, "yag": 15}},
-        {{"ogun_adi": "Ara Öğün 1", "yemekler": ["Elma"], "kalori": 80, "protein": 1, "karbonhidrat": 20, "yag": 0}},
-        {{"ogun_adi": "Öğle Yemeği", "yemekler": ["Tavuk", "Pilav"], "kalori": 500, "protein": 40, "karbonhidrat": 50, "yag": 15}},
-        {{"ogun_adi": "Ara Öğün 2", "yemekler": ["Yoğurt"], "kalori": 100, "protein": 10, "karbonhidrat": 12, "yag": 3}},
-        {{"ogun_adi": "Akşam Yemeği", "yemekler": ["Balık", "Salata"], "kalori": 400, "protein": 35, "karbonhidrat": 20, "yag": 18}}
-      ],
-      "toplam_kalori": 1430, "toplam_protein": 111, "toplam_karbonhidrat": 132, "toplam_yag": 51
-    }}
-  ]
-}}
-
-Sadece JSON, açıklama yok. 7 günün HEPSİNİ yaz.
-"""
-        
-        # API isteği
-        headers = {'Content-Type': 'application/json'}
-        data = {
-            'contents': [{
-                'parts': [{'text': prompt}]
-            }],
-            'generationConfig': {
-                'temperature': 0.5,
-                'maxOutputTokens': 8192
-            }
-        }
-        
-        print("=== API'YE İSTEK GÖNDERİLİYOR ===")
-        
-        # Retry mekanizması - 3 deneme
-        for attempt in range(3):
-            try:
-                response = requests.post(url, headers=headers, json=data, timeout=60)
-                response.raise_for_status()
-                break
-            except requests.exceptions.HTTPError as e:
-                if attempt < 2:  # Son denemede değilse
-                    print(f"=== DENEME {attempt + 1} BAŞARISIZ, YENİDEN DENENİYOR ===")
-                    import time
-                    time.sleep(2)  # 2 saniye bekle
-                    continue
-                else:
-                    raise  # Son denemede de başarısız olursa hatayı fırlat
-        
-        result_data = response.json()
-        print(f"=== API YANITI ALINDI ===")
-        
-        if 'candidates' in result_data and len(result_data['candidates']) > 0:
-            meal_plan_text = result_data['candidates'][0]['content']['parts'][0]['text']
-            
-            print("=== AI YANITI ===")
-            print(meal_plan_text[:500])
-            print("=================")
-            
-            # JSON temizleme
-            meal_plan_text = meal_plan_text.strip()
-            if meal_plan_text.startswith('```json'):
-                meal_plan_text = meal_plan_text[7:]
-            if meal_plan_text.startswith('```'):
-                meal_plan_text = meal_plan_text[3:]
-            if meal_plan_text.endswith('```'):
-                meal_plan_text = meal_plan_text[:-3]
-            meal_plan_text = meal_plan_text.strip()
-            
-            # JSON parse
-            try:
-                meal_plan_data = json.loads(meal_plan_text)
-                print("=== JSON PARSE BAŞARILI ===")
-                return meal_plan_data
-            except json.JSONDecodeError as e:
-                print(f"=== JSON PARSE HATASI: {str(e)} ===")
-                import re
-                match = re.search(r'\{.*\}', meal_plan_text, re.DOTALL)
-                if match:
-                    meal_plan_data = json.loads(match.group(0))
-                    print("=== REGEX İLE JSON PARSE BAŞARILI ===")
-                    return meal_plan_data
-        else:
-            print("=== API YANITI BOŞ VEYA HATALI ===")
-        
-        return None
-        
-    except Exception as e:
-        print(f"=== MEAL PLAN HATASI: {str(e)} ===")
-        import traceback
-        traceback.print_exc()
-        return None
 
 # ============= AUTH ROUTES =============
 

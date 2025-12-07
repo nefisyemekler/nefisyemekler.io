@@ -9,7 +9,7 @@
             <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
                 <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill">🔥 Haftanın Trendi</span>
                 <h1 class="hero-title">Lezzetin Sanata<br>Dönüştüğü Yer.</h1>
-                <p class="hero-desc">Yapay zeka destekli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Binlerce tarifi keşfedin.</p>
+                <p class="hero-desc">En lezzetli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Binlerce tarifi keşfedin.</p>
                 
                 <form action="{{ url_for('search') }}" method="GET" class="d-flex position-relative mb-4">
                     <input type="search" name="q" class="form-control glass-search w-100" placeholder="Bugün ne pişirmek istersin? (Örn: Makarna, Kek...)" value="{{ request.args.get('q', '') }}">
@@ -19,7 +19,7 @@
                 </form>
 
                 <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
-                    <a href="{{ url_for('ai_recipe') }}" class="btn btn-primary-glow"><i class="fas fa-magic me-2"></i> AI Tarif Ã–ner</a>
+                    <a href="{{ url_for('add_recipe') }}" class="btn btn-primary-glow"><i class="fas fa-plus-circle me-2"></i> Tarif Ekle</a>
                     <a href="#recipes-grid" class="btn btn-outline-light rounded-pill px-4">Keşfet</a>
                 </div>
             </div>
