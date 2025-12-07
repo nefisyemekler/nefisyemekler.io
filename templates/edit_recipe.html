@@ -6,7 +6,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            <div class="glass-card p-0 p-md-5">
+            <div class="glass-card p-4 p-md-5">
                 <div class="text-center mb-5">
                     <span class="badge bg-warning bg-opacity-25 text-warning mb-2 px-3 py-2 rounded-pill border border-warning border-opacity-25">
                         <i class="fas fa-edit me-1"></i> Düzenleme
@@ -53,43 +53,29 @@
                         <div class="col-md-4">
                             <label class="form-label text-muted small"><i class="fas fa-users text-info me-1"></i> Porsiyon</label>
                             <input type="number" class="form-control text-center" name="servings" value="{{ recipe.servings or '' }}">
-                                {% endfor %}
-                            </ul>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Malzemeler (Her satıra bir malzeme)</label>
+                            <textarea class="form-control" name="ingredients" rows="8" placeholder="Örn:&#10;2 yumurta&#10;1 su bardağı süt&#10;2 yemek kaşığı tereyağı">{{ recipe.ingredients }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Hazırlanışı (Her satıra bir adım)</label>
+                            <textarea class="form-control" name="instructions" rows="10" placeholder="Örn:&#10;Yumurtaları çırpın&#10;Süt ve tereyağını ekleyin&#10;Karışımı tavaya dökün">{{ recipe.instructions }}</textarea>
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-save me-2"></i> Değişiklikleri Kaydet
+                            </button>
+                            <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn btn-outline-secondary btn-lg px-5 ms-2">
+                                <i class="fas fa-times me-2"></i> İptal
+                            </a>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="p-3 rounded-3 h-100" style="background: rgba(255,255,255,0.03);">
-                            <h5 class="text-info mb-3"><i class="fas fa-fire me-2"></i>Detaylar</h5>
-                            <div class="d-flex justify-content-between text-muted small">
-                                <span>Hazırlık:</span> <strong>{{ recipe_suggestion.prep_time }} dk</strong>
-                            </div>
-                            <div class="d-flex justify-content-between text-muted small mt-2">
-                                <span>Pişirme:</span> <strong>{{ recipe_suggestion.cook_time }} dk</strong>
-                            </div>
-                            <div class="d-flex justify-content-between text-muted small mt-2">
-                                <span>Porsiyon:</span> <strong>{{ recipe_suggestion.servings }} Kişilik</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h5 class="text-primary mb-3"><i class="fas fa-sort-numeric-down me-2"></i>Hazırlanışı</h5>
-                    <ol class="text-muted ps-3">
-                        {% for step in recipe_suggestion.instructions %}
-                        <li class="mb-2">{{ step }}</li>
-                        {% endfor %}
-                    </ol>
-                </div>
+                </form>
             </div>
-            {% endif %}
-
-            {% if error %}
-            <div class="alert alert-danger mt-4 bg-danger bg-opacity-25 border-danger text-light">
-                <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
-            </div>
-            {% endif %}
-
         </div>
     </div>
 </div>
