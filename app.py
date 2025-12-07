@@ -678,11 +678,11 @@ def edit_recipe(recipe_id):
                 # Dosya yüklenmişse kaydet
                 file = request.files['image']
                 if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                image_filename = f"{timestamp}_{filename}"
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
-                recipe.image = image_filename
+                    filename = secure_filename(file.filename)
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    image_filename = f"{timestamp}_{filename}"
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+                    recipe.image = image_filename
         
         db.session.commit()
         flash('Tarif güncellendi!', 'success')
