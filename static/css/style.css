@@ -399,3 +399,25 @@ footer {
 .glass-footer {
     margin-top: 5rem !important; /* İçerikten ekstra uzaklaştır */
 }
+/* --- RESİM DÜZELTMESİ (Beyaz Kenarları Kesme) --- */
+
+/* Hero Bölümündeki ve Kartlardaki Yemek Resimleri İçin */
+.floating-plate, 
+.card-img-wrapper img,
+.glass-card img {
+    border-radius: 50%; /* Resmi tam daire yapar */
+    aspect-ratio: 1 / 1; /* En ve boyu eşitler (kare/daire olmasını garantiler) */
+    object-fit: cover; /* Resmin daire içine sündürülmeden oturmasını sağlar */
+    border: 4px solid rgba(255, 255, 255, 0.1); /* Etrafına şık, ince bir çerçeve ekler */
+}
+
+/* Eğer dikdörtgen (kart) resimlerin yuvarlak olmasını istemiyorsan,
+   sadece Hero (ana sayfa üst kısım) resmini yuvarlak yapmak için bunu kullan: */
+.floating-plate {
+    border-radius: 50% !important;
+    width: 450px;      /* Sabit genişlik verelim ki tam daire olsun */
+    height: 450px;     /* Yükseklik genişlikle aynı olmalı */
+    object-fit: cover;
+    background-color: transparent; /* Arka planı şeffaf yap */
+    box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Derinlik katar */
+}
