@@ -49,7 +49,7 @@
                         
                         <div class="col-md-6">
                             <label class="form-label text-muted small">Fotoğraf URL'si</label>
-                            <input type="url" class="form-control" name="image_url" placeholder="https://i.hizliresim.com/xxxxx.jpeg" value="{{ recipe.image if recipe.image and recipe.image.startswith('http') else '' }}">
+                            <input type="url" class="form-control" name="image_url" placeholder="https://i.hizliresim.com/xxxxx.jpeg" value="{{ recipe.image if recipe.image and '://' in recipe.image else '' }}">
                             <div class="form-text text-muted">Hızlıresim veya benzeri siteden link girin</div>
                         </div>
                         <div class="col-md-6">

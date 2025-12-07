@@ -22,7 +22,7 @@
             <div class="glass-card h-100 p-0 overflow-hidden d-flex flex-column" style="transition: transform 0.3s;">
                 <div style="height: 180px; position: relative;">
                     {% if recipe.image %}
-                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                    {% if '://' in recipe.image or recipe.image[:2] == '//' %}
                     <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="w-100 h-100" style="object-fit: cover;">
                     {% else %}
                     <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" alt="{{ recipe.title }}" class="w-100 h-100" style="object-fit: cover;">

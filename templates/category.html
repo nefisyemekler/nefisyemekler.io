@@ -18,7 +18,7 @@
                 
                 <div style="height: 220px; width: 100%; position: relative;">
                     {% if recipe.image %}
-                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                    {% if '://' in recipe.image or recipe.image[:2] == '//' %}
                     <img src="{{ recipe.image }}" alt="{{ recipe.title }}"
                         class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
                     {% else %}

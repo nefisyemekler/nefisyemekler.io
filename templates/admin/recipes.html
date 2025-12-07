@@ -56,7 +56,7 @@
                             <tr class="hover-glass-row" style="transition: 0.3s;">
                                 <td>
                                     {% if recipe.image %}
-                                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                                    {% if '://' in recipe.image or recipe.image[:2] == '//' %}
                                     <img src="{{ recipe.image }}" class="rounded-3 shadow-sm" alt="{{ recipe.title }}" style="width: 50px; height: 50px; object-fit: cover;">
                                     {% else %}
                                     <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="rounded-3 shadow-sm" alt="{{ recipe.title }}" style="width: 50px; height: 50px; object-fit: cover;">

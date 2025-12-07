@@ -151,7 +151,7 @@
                 
                 {% if recipe.image %}
                 <div class="mt-auto">
-                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                    {% if '://' in recipe.image or recipe.image[:2] == '//' %}
                         <img src="{{ recipe.image }}" class="w-100" style="height: 200px; object-fit: cover;">
                     {% else %}
                         <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="w-100" style="height: 200px; object-fit: cover;">
