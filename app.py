@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from models import db, User, Category, Recipe, Comment, Page, Image
 from datetime import datetime
+from urllib.parse import urljoin
 
 # Load environment variables
 load_dotenv()
@@ -30,6 +31,46 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 # Create upload folder if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+def resolve_image_url(candidate_url):
+    """Try to resolve a possibly-short or HTML page URL to a direct image URL.
+    Returns a direct image URL (possibly after redirects) or None if not found.
+    """
+    if not candidate_url:
+        return None
+    try:
+        # Follow redirects and prefer HEAD for speed
+        resp = requests.head(candidate_url, allow_redirects=True, timeout=5)
+        ctype = resp.headers.get('Content-Type', '')
+        if ctype.startswith('image'):
+            return resp.url
+
+        # If HEAD didn't return an image, GET the page and try to extract an image
+        resp = requests.get(candidate_url, allow_redirects=True, timeout=6)
+        ctype = resp.headers.get('Content-Type', '')
+        if ctype.startswith('image'):
+            return resp.url
+
+        html = resp.text or ''
+        # Try common meta tags
+        m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+        if not m:
+            m = re.search(r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+        if m:
+            img_url = m.group(1)
+            return urljoin(resp.url, img_url)
+
+        # Fallback: first <img> tag
+        m = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', html, re.I)
+        if m:
+            img_url = m.group(1)
+            return urljoin(resp.url, img_url)
+
+    except Exception:
+        # Don't crash on network errors; caller can fallback to original URL
+        return None
+    return None
 
 # Initialize extensions
 db.init_app(app)
@@ -612,8 +653,13 @@ def add_recipe():
         image_url = request.form.get('image_url', '').strip()
         
         if image_url:
-            # URL girilmişse direkt kullan
-            image_filename = image_url
+            # URL girilmişse önce doğrudan resim olup olmadığını çözmeyi dene
+            resolved = resolve_image_url(image_url)
+            if resolved:
+                image_filename = resolved
+            else:
+                # Eğer resolver bulamadıysa kullanıcının verdiği URL'i yine kaydet (kullanıcı manuel düzeltme yapabilir)
+                image_filename = image_url
         elif 'image' in request.files:
             # Dosya yüklenmişse kaydet
             file = request.files['image']
@@ -682,8 +728,12 @@ def edit_recipe(recipe_id):
             image_url = request.form.get('image_url', '').strip()
             
             if image_url:
-                # URL girilmişse direkt kullan
-                recipe.image = image_url
+                # URL girilmişse önce doğrudan resim olup olmadığını çözmeyi dene
+                resolved = resolve_image_url(image_url)
+                if resolved:
+                    recipe.image = resolved
+                else:
+                    recipe.image = image_url
             elif 'image' in request.files:
                 # Dosya yüklenmişse kaydet
                 file = request.files['image']
