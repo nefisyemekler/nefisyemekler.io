@@ -665,7 +665,7 @@ def edit_recipe(recipe_id):
         recipe.servings = request.form.get('servings', type=int)
         
         # Fotoğraf silme kontrolü
-        if request.form.get('remove_image'):
+        if 'remove_image' in request.form:
             recipe.image = None
         else:
             # Fotoğraf güncelleme - URL veya dosya yükleme
@@ -677,7 +677,7 @@ def edit_recipe(recipe_id):
             elif 'image' in request.files:
                 # Dosya yüklenmişse kaydet
                 file = request.files['image']
-            if file and file.filename and allowed_file(file.filename):
+                if file and file.filename and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                 image_filename = f"{timestamp}_{filename}"
