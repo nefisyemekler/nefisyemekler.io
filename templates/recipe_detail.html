@@ -151,7 +151,11 @@
                 
                 {% if recipe.image %}
                 <div class="mt-auto">
-                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="w-100" style="height: 200px; object-fit: cover;">
+                    {% if recipe.image.startswith('http') %}
+                        <img src="{{ recipe.image }}" class="w-100" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="w-100" style="height: 200px; object-fit: cover;">
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

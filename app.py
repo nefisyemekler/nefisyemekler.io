@@ -655,6 +655,16 @@ def edit_recipe(recipe_id):
         return redirect(url_for('recipe_detail', recipe_id=recipe_id))
     
     if request.method == 'POST':
+        # DEBUG: log incoming form/files to help diagnose remove_image issue
+        try:
+            print('\n--- DEBUG edit_recipe POST ---')
+            print('form:', dict(request.form))
+            print('files:', list(request.files.keys()))
+            print('remove_image raw:', request.form.get('remove_image'))
+        except Exception as e:
+            print('DEBUG logging error:', e)
+        # also show a short flash for quick UI feedback
+        flash(f"DEBUG: remove_image={request.form.get('remove_image')}", 'info')
         recipe.title = request.form.get('title')
         recipe.content = request.form.get('content')
         recipe.ingredients = request.form.get('ingredients')
@@ -664,8 +674,8 @@ def edit_recipe(recipe_id):
         recipe.cook_time = request.form.get('cook_time', type=int)
         recipe.servings = request.form.get('servings', type=int)
         
-        # Fotoğraf silme kontrolü
-        if 'remove_image' in request.form:
+        # Fotoğraf silme kontrolü (checkbox değeri kontrolü daha sağlam)
+        if request.form.get('remove_image') in ('1', 'on', 'true'):
             recipe.image = None
         else:
             # Fotoğraf güncelleme - URL veya dosya yükleme

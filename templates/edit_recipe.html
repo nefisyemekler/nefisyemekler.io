@@ -38,7 +38,7 @@
                                     <strong>Mevcut Fotoğraf:</strong> {{ recipe.image[:50] }}{{ '...' if recipe.image|length > 50 else '' }}
                                 </div>
                                 <div class="form-check form-switch ms-3">
-                                    <input class="form-check-input" type="checkbox" name="remove_image" id="removeImage">
+                                    <input class="form-check-input" type="checkbox" name="remove_image" id="removeImage" value="1">
                                     <label class="form-check-label text-danger" for="removeImage">
                                         <i class="fas fa-trash"></i> Sil
                                     </label>
@@ -95,6 +95,23 @@
                         </div>
                     </div>
                 </form>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const removeCheckbox = document.getElementById('removeImage');
+                        if (!removeCheckbox) return;
+                        removeCheckbox.addEventListener('change', function() {
+                            if (this.checked) {
+                                const ok = confirm('Fotoğrafı silmek istediğinize emin misiniz? Form otomatik kaydedilecek.');
+                                if (ok) {
+                                    // submit the parent form
+                                    this.form.submit();
+                                } else {
+                                    this.checked = false;
+                                }
+                            }
+                        });
+                    });
+                </script>
             </div>
         </div>
     </div>
