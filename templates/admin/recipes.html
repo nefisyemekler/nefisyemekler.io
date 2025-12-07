@@ -56,7 +56,11 @@
                             <tr class="hover-glass-row" style="transition: 0.3s;">
                                 <td>
                                     {% if recipe.image %}
-                                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="rounded-3 shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                                    <img src="{{ recipe.image }}" class="rounded-3 shadow-sm" alt="{{ recipe.title }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="rounded-3 shadow-sm" alt="{{ recipe.title }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
                                     {% else %}
                                     <div class="bg-dark bg-opacity-50 rounded-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                         <i class="fas fa-utensils text-muted"></i>

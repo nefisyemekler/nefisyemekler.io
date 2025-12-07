@@ -59,7 +59,11 @@
                 <div class="glass-card">
                     <div class="card-img-wrapper">
                         {% if recipe.image %}
+                        {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                        <img src="{{ recipe.image }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% else %}
                         <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% endif %}
                         {% else %}
                         <div class="d-flex align-items-center justify-content-center h-100 bg-secondary">
                             <i class="fas fa-utensils fa-3x text-white-50"></i>

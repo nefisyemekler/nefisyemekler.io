@@ -19,8 +19,13 @@
                 
                 <div style="height: 200px; width: 100%; position: relative; background: #2d2d2d;">
                     {% if recipe.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
-                         class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;" alt="{{ recipe.title }}">
+                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                    <img src="{{ recipe.image }}" alt="{{ recipe.title }}"
+                        class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" alt="{{ recipe.title }}"
+                        class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+                    {% endif %}
                     {% else %}
                     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                         <i class="fas fa-utensils fa-3x text-white-50"></i>

@@ -22,7 +22,11 @@
             <div class="glass-card h-100 p-0 overflow-hidden d-flex flex-column" style="transition: transform 0.3s;">
                 <div style="height: 180px; position: relative;">
                     {% if recipe.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="w-100 h-100" style="object-fit: cover;">
+                    {% if '://' in recipe.image or recipe.image.startswith('//') %}
+                    <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="w-100 h-100" style="object-fit: cover;">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" alt="{{ recipe.title }}" class="w-100 h-100" style="object-fit: cover;">
+                    {% endif %}
                     {% else %}
                     <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center"><i class="fas fa-utensils text-white-50 fa-2x"></i></div>
                     {% endif %}
