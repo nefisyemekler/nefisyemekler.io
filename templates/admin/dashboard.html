@@ -1,98 +1,149 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Panel - Nefis Yemekler{% endblock %}
+{% block title %}Admin Paneli - Nefis Yemekler{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-3">
-            <div class="list-group">
-                <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-utensils"></i> Tarifler
-                </a>
-                <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tags"></i> Kategoriler
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-users"></i> Kullanıcılar
-                </a>
-                <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-comments"></i> Yorumlar
-                </a>
-                <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-file-alt"></i> Sayfalar
-                </a>
-                <hr>
-                <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-arrow-left"></i> Siteye Dön
-                </a>
+            <div class="glass-card p-3">
+                <div class="text-center mb-4 pt-2">
+                    <div class="bg-primary bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                        <i class="fas fa-user-shield fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Yönetici Paneli</h5>
+                    <small class="text-muted">Hoş geldin, {{ current_user.username }}</small>
+                </div>
+
+                <div class="list-group list-group-flush bg-transparent">
+                    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action bg-transparent text-white border-0 rounded-3 mb-1 active-glass">
+                        <i class="fas fa-tachometer-alt me-2 text-warning"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-utensils me-2 text-info"></i> Tarifler
+                    </a>
+                    <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-tags me-2 text-success"></i> Kategoriler
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-users me-2 text-danger"></i> Kullanıcılar
+                    </a>
+                    <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-comments me-2 text-primary"></i> Yorumlar
+                    </a>
+                    <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-file-alt me-2 text-secondary"></i> Sayfalar
+                    </a>
+                    <hr class="border-secondary my-2">
+                    <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 hover-glass">
+                        <i class="fas fa-arrow-left me-2"></i> Siteye Dön
+                    </a>
+                </div>
             </div>
         </div>
         
         <div class="col-md-9">
-            <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+            <h2 class="mb-4 fw-bold" style="font-family: 'Playfair Display', serif;">Genel Bakış</h2>
             
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <h5 class="card-title">Kullanıcılar</h5>
-                            <h2>{{ stats.users }}</h2>
-                            <a href="{{ url_for('admin_users') }}" class="btn btn-light btn-sm">Görüntüle</a>
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between h-100 position-relative overflow-hidden group-hover-scale">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="fas fa-users fa-4x text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Kullanıcılar</h6>
+                            <h2 class="fw-bold mb-0 text-white">{{ stats.users }}</h2>
+                        </div>
+                        <div class="icon-box bg-primary bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-users text-primary fa-lg"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3 mb-4">
-                    <div class="card bg-success text-white">
-                        <div class="card-body">
-                            <h5 class="card-title">Tarifler</h5>
-                            <h2>{{ stats.recipes }}</h2>
-                            <a href="{{ url_for('admin_recipes') }}" class="btn btn-light btn-sm">Görüntüle</a>
+                <div class="col-md-3">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between h-100 position-relative overflow-hidden group-hover-scale">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="fas fa-utensils fa-4x text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Tarifler</h6>
+                            <h2 class="fw-bold mb-0 text-white">{{ stats.recipes }}</h2>
+                        </div>
+                        <div class="icon-box bg-success bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-utensils text-success fa-lg"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3 mb-4">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body">
-                            <h5 class="card-title">Kategoriler</h5>
-                            <h2>{{ stats.categories }}</h2>
-                            <a href="{{ url_for('admin_categories') }}" class="btn btn-light btn-sm">Görüntüle</a>
+                <div class="col-md-3">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between h-100 position-relative overflow-hidden group-hover-scale">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="fas fa-tags fa-4x text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Kategoriler</h6>
+                            <h2 class="fw-bold mb-0 text-white">{{ stats.categories }}</h2>
+                        </div>
+                        <div class="icon-box bg-warning bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-tags text-warning fa-lg"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3 mb-4">
-                    <div class="card bg-info text-white">
-                        <div class="card-body">
-                            <h5 class="card-title">Yorumlar</h5>
-                            <h2>{{ stats.comments }}</h2>
-                            <a href="{{ url_for('admin_comments') }}" class="btn btn-light btn-sm">Görüntüle</a>
+                <div class="col-md-3">
+                    <div class="glass-card p-3 d-flex align-items-center justify-content-between h-100 position-relative overflow-hidden group-hover-scale">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="fas fa-comments fa-4x text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Yorumlar</h6>
+                            <h2 class="fw-bold mb-0 text-white">{{ stats.comments }}</h2>
+                        </div>
+                        <div class="icon-box bg-info bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-comments text-info fa-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Hoş Geldiniz, {{ current_user.username }}!</h4>
-                </div>
-                <div class="card-body">
-                    <p>Admin paneline hoş geldiniz. Bu panel üzerinden sitenin tüm içeriklerini yönetebilirsiniz.</p>
-                    <ul>
-                        <li>Tarifleri görüntüleyin, düzenleyin ve silin</li>
-                        <li>Kategorileri yönetin</li>
-                        <li>Kullanıcıları yönetin ve admin yetkisi verin</li>
-                        <li>Yorumları moderasyon edin</li>
-                        <li>Sayfa içeriklerini düzenleyin</li>
-                    </ul>
+            <div class="glass-card p-4">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="bg-primary-glow p-3 rounded-3">
+                        <i class="fas fa-crown fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-2">Yönetim Paneline Hoş Geldiniz!</h4>
+                        <p class="text-muted mb-3">Bu panel üzerinden sitenin tüm içeriklerini, kullanıcılarını ve etkileşimlerini kolayca yönetebilirsiniz. Yapmak istediğiniz işlem için sol menüyü kullanabilirsiniz.</p>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('add_recipe') }}" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                                <i class="fas fa-plus me-1"></i> Hızlı Tarif Ekle
+                            </a>
+                            <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                                <i class="fas fa-globe me-1"></i> Siteyi Görüntüle
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.active-glass {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-left: 3px solid var(--primary) !important;
+    color: white !important;
+}
+.hover-glass:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+}
+.group-hover-scale:hover .icon-box {
+    transform: scale(1.1);
+    transition: 0.3s;
+}
+</style>
 {% endblock %}

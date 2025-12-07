@@ -4,96 +4,72 @@
 
 {% block content %}
 <div class="container-fluid py-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-3">
-            <div class="list-group">
-                <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-utensils"></i> Tarifler
-                </a>
-                <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tags"></i> Kategoriler
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-users"></i> Kullanıcılar
-                </a>
-                <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-comments"></i> Yorumlar
-                </a>
-                <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-file-alt"></i> Sayfalar
-                </a>
-                <hr>
-                <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-arrow-left"></i> Siteye Dön
-                </a>
+            <div class="glass-card p-3">
+                <div class="list-group list-group-flush bg-transparent">
+                    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-tachometer-alt me-2 text-warning"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-utensils me-2 text-info"></i> Tarifler
+                    </a>
+                    <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-tags me-2 text-success"></i> Kategoriler
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-users me-2 text-danger"></i> Kullanıcılar
+                    </a>
+                    <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action bg-transparent text-white border-0 rounded-3 mb-1 active-glass">
+                        <i class="fas fa-comments me-2 text-primary"></i> Yorumlar
+                    </a>
+                    <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-file-alt me-2 text-secondary"></i> Sayfalar
+                    </a>
+                </div>
             </div>
         </div>
         
         <div class="col-md-9">
-            <h1 class="mb-4"><i class="fas fa-comments"></i> Yorumlar Yönetimi</h1>
-            
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Kullanıcı</th>
-                                    <th>Tarif</th>
-                                    <th>Yorum</th>
-                                    <th>Puan</th>
-                                    <th>Tarih</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for comment in comments %}
-                                <tr>
-                                    <td>{{ comment.id }}</td>
-                                    <td>{{ comment.user.username }}</td>
-                                    <td>
-                                        <a href="{{ url_for('recipe_detail', recipe_id=comment.recipe.id) }}" 
-                                           target="_blank">
-                                            {{ comment.recipe.title }}
-                                        </a>
-                                    </td>
-                                    <td>{{ comment.body[:50] }}...</td>
-                                    <td>
-                                        {% if comment.rating %}
-                                        <span class="text-warning">
-                                            {% for i in range(comment.rating) %}
-                                                <i class="fas fa-star"></i>
-                                            {% endfor %}
-                                        </span>
-                                        {% else %}
-                                        -
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                                    <td>
-                                        <form action="{{ url_for('admin_delete_comment', comment_id=comment.id) }}" 
-                                              method="POST" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Bu yorumu silmek istediğinizden emin misiniz?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {% if not comments %}
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle"></i> Henüz yorum bulunmuyor.
-                    </div>
-                    {% endif %}
+            <div class="glass-card p-4">
+                <h2 class="fw-bold mb-4" style="font-family: 'Playfair Display', serif;"><i class="fas fa-comments me-2 text-primary"></i>Yorumlar</h2>
+                
+                <div class="table-responsive">
+                    <table class="table text-light align-middle" style="border-color: rgba(255,255,255,0.1);">
+                        <thead>
+                            <tr class="text-muted small text-uppercase">
+                                <th>Kullanıcı</th>
+                                <th>Yorum & Tarif</th>
+                                <th>Puan</th>
+                                <th>Tarih</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in comments %}
+                            <tr style="background: transparent;">
+                                <td class="fw-bold text-nowrap"><i class="fas fa-user-circle me-1 text-muted"></i> {{ comment.user.username }}</td>
+                                <td style="min-width: 300px;">
+                                    <div class="text-light fst-italic">"{{ comment.body[:80] }}..."</div>
+                                    <a href="{{ url_for('recipe_detail', recipe_id=comment.recipe.id) }}" class="small text-primary text-decoration-none">
+                                        <i class="fas fa-link me-1"></i>{{ comment.recipe.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="text-warning small text-nowrap">
+                                        {% for i in range(comment.rating or 0) %}<i class="fas fa-star"></i>{% endfor %}
+                                    </div>
+                                </td>
+                                <td class="text-muted small text-nowrap">{{ comment.created_at.strftime('%d.%m.%Y') }}</td>
+                                <td class="text-end">
+                                    <form action="{{ url_for('admin_delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" onclick="return confirm('Yorumu silmek istediğine emin misin?')"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

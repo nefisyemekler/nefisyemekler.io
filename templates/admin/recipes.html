@@ -4,95 +4,124 @@
 
 {% block content %}
 <div class="container-fluid py-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-3">
-            <div class="list-group">
-                <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-utensils"></i> Tarifler
-                </a>
-                <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tags"></i> Kategoriler
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-users"></i> Kullanıcılar
-                </a>
-                <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-comments"></i> Yorumlar
-                </a>
-                <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-file-alt"></i> Sayfalar
-                </a>
-                <hr>
-                <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action">
-                    <i class="fas fa-arrow-left"></i> Siteye Dön
-                </a>
+            <div class="glass-card p-3">
+                <div class="list-group list-group-flush bg-transparent">
+                    <a href="{{ url_for('admin_dashboard') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-tachometer-alt me-2 text-warning"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('admin_recipes') }}" class="list-group-item list-group-item-action bg-transparent text-white border-0 rounded-3 mb-1 active-glass">
+                        <i class="fas fa-utensils me-2 text-info"></i> Tarifler
+                    </a>
+                    <a href="{{ url_for('admin_categories') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-tags me-2 text-success"></i> Kategoriler
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-users me-2 text-danger"></i> Kullanıcılar
+                    </a>
+                    <a href="{{ url_for('admin_comments') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-comments me-2 text-primary"></i> Yorumlar
+                    </a>
+                    <a href="{{ url_for('admin_pages') }}" class="list-group-item list-group-item-action bg-transparent text-white-50 border-0 rounded-3 mb-1 hover-glass">
+                        <i class="fas fa-file-alt me-2 text-secondary"></i> Sayfalar
+                    </a>
+                </div>
             </div>
         </div>
         
         <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1><i class="fas fa-utensils"></i> Tarifler Yönetimi</h1>
-                <a href="{{ url_for('add_recipe') }}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Yeni Tarif Ekle
-                </a>
-            </div>
-            
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Başlık</th>
-                                    <th>Kategori</th>
-                                    <th>Yazar</th>
-                                    <th>Tarih</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for recipe in recipes %}
-                                <tr>
-                                    <td>{{ recipe.id }}</td>
-                                    <td>{{ recipe.title }}</td>
-                                    <td><span class="badge bg-primary">{{ recipe.category.name }}</span></td>
-                                    <td>{{ recipe.author.username }}</td>
-                                    <td>{{ recipe.created_at.strftime('%d.%m.%Y') }}</td>
-                                    <td>
-                                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" 
-                                           class="btn btn-info btn-sm" target="_blank">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" 
-                                           class="btn btn-warning btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ url_for('admin_delete_recipe', recipe_id=recipe.id) }}" 
-                                              method="POST" class="d-inline">
-                                            <button type="submit" class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Bu tarifi silmek istediğinizden emin misiniz?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    {% if not recipes %}
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle"></i> Henüz tarif bulunmuyor.
-                    </div>
-                    {% endif %}
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif;"><i class="fas fa-utensils me-2 text-info"></i>Tarif Yönetimi</h2>
+                    <a href="{{ url_for('add_recipe') }}" class="btn btn-primary-glow btn-sm rounded-pill px-3">
+                        <i class="fas fa-plus me-1"></i> Yeni Tarif Ekle
+                    </a>
                 </div>
+                
+                <div class="table-responsive">
+                    <table class="table text-light align-middle" style="border-color: rgba(255,255,255,0.1);">
+                        <thead>
+                            <tr class="text-muted small text-uppercase" style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th style="width: 80px;">Görsel</th>
+                                <th>Tarif Başlığı</th>
+                                <th>Kategori</th>
+                                <th>Yazar</th>
+                                <th>Tarih</th>
+                                <th class="text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recipe in recipes %}
+                            <tr class="hover-glass-row" style="transition: 0.3s;">
+                                <td>
+                                    {% if recipe.image %}
+                                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="rounded-3 shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-dark bg-opacity-50 rounded-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-utensils text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold">{{ recipe.title }}</td>
+                                <td>
+                                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3">
+                                        {{ recipe.category.name }}
+                                    </span>
+                                </td>
+                                <td class="text-muted small">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-circle me-2"></i> {{ recipe.author.username }}
+                                    </div>
+                                </td>
+                                <td class="text-muted small">{{ recipe.created_at.strftime('%d.%m.%Y') }}</td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn btn-icon btn-sm text-light" title="Görüntüle" target="_blank"><i class="fas fa-eye"></i></a>
+                                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-icon btn-sm text-warning" title="Düzenle"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ url_for('admin_delete_recipe', recipe_id=recipe.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-icon btn-sm text-danger" onclick="return confirm('Bu tarifi silmek istediğinize emin misiniz?')" title="Sil"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if not recipes %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
+                    <p>Henüz hiç tarif bulunmuyor.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Tablo Satırı Hover Efekti */
+.hover-glass-row:hover {
+    background: rgba(255,255,255,0.05) !important;
+}
+/* İkon Butonlar */
+.btn-icon {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    transition: 0.3s;
+}
+.btn-icon:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+</style>
 {% endblock %}

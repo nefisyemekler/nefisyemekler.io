@@ -4,43 +4,49 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-book"></i> Tariflerim</h1>
-        <a href="{{ url_for('add_recipe') }}" class="btn btn-success">
-            <i class="fas fa-plus-circle"></i> Yeni Tarif Ekle
+    
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold text-white" style="font-family: 'Playfair Display', serif;">Tariflerim</h1>
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary-glow px-4">
+            <i class="fas fa-plus me-2"></i> Yeni Ekle
         </a>
     </div>
-    
-    <div class="row">
+
+    <div class="row g-4">
         {% for recipe in recipes %}
-        <div class="col-md-4 col-sm-6 mb-4">
-            <div class="card h-100">
-                {% if recipe.image %}
-                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
-                     class="card-img-top" alt="{{ recipe.title }}" style="height: 200px; object-fit: cover;">
-                {% else %}
-                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
-                     style="height: 200px;">
-                    <i class="fas fa-utensils fa-3x text-white"></i>
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ recipe.title }}</h5>
-                    <p class="card-text">{{ recipe.content[:100] }}...</p>
-                    <div class="mb-2">
-                        <span class="badge bg-primary">{{ recipe.category.name }}</span>
-                        <span class="text-muted small">
-                            {{ recipe.comments|length }} yorum
-                        </span>
+        <div class="col-lg-4 col-md-6">
+            <div class="glass-card h-100 p-0 overflow-hidden d-flex flex-column group-hover-effect" style="border: 1px solid rgba(255,255,255,0.1);">
+                
+                <div style="height: 200px; width: 100%; position: relative; background: #2d2d2d;">
+                    {% if recipe.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
+                         class="w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;" alt="{{ recipe.title }}">
+                    {% else %}
+                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-utensils fa-3x text-white-50"></i>
                     </div>
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" 
-                           class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i> Görüntüle
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-4 d-flex flex-column align-items-start text-start">
+                    
+                    <h4 class="fw-bold text-white mb-2">{{ recipe.title }}</h4>
+                    
+                    <p class="text-muted small mb-3 flex-grow-1 line-clamp-2">
+                        {{ recipe.content }}
+                    </p>
+
+                    <div class="d-flex align-items-center gap-2 mb-3 w-100">
+                        <span class="badge bg-primary px-2">{{ recipe.category.name }}</span>
+                        <span class="text-muted small">{{ recipe.comments|length }} yorum</span>
+                    </div>
+
+                    <div class="w-100 mt-auto d-grid gap-2">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn btn-primary text-white border-0 fw-bold py-2" style="background-color: #4855fe;">
+                            <i class="fas fa-eye me-2"></i> Görüntüle
                         </a>
-                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" 
-                           class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i> Düzenle
+                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-warning border-0 fw-bold py-2" style="background-color: #ffc107; color: #000;">
+                            <i class="fas fa-edit me-2"></i> Düzenle
                         </a>
                     </div>
                 </div>
@@ -50,13 +56,15 @@
     </div>
     
     {% if not recipes %}
-    <div class="alert alert-info text-center">
-        <i class="fas fa-info-circle"></i> Henüz tarif eklemediniz.
-        <br>
-        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary mt-3">
-            <i class="fas fa-plus-circle"></i> İlk Tarifini Ekle
-        </a>
+    <div class="text-center py-5 text-muted">
+        <h3>Henüz tarifin yok.</h3>
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary-glow mt-3">İlk Tarifini Ekle</a>
     </div>
     {% endif %}
 </div>
+
+<style>
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.group-hover-effect:hover img { transform: scale(1.1); }
+</style>
 {% endblock %}

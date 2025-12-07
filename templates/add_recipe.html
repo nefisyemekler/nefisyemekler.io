@@ -5,77 +5,74 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0"><i class="fas fa-plus-circle"></i> Yeni Tarif Ekle</h3>
+        <div class="col-lg-9">
+            <div class="glass-card p-0 p-md-5">
+                <div class="text-center mb-5">
+                    <span class="badge bg-success bg-opacity-25 text-success mb-2 px-3 py-2 rounded-pill border border-success border-opacity-25">
+                        <i class="fas fa-feather-alt me-1"></i> Yeni İçerik
+                    </span>
+                    <h2 class="fw-bold mt-2" style="font-family: 'Playfair Display', serif;">Tarif Paylaş</h2>
                 </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Tarif Adı *</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Tarif Adı</label>
+                            <input type="text" class="form-control form-control-lg" name="title" placeholder="Örn: Ev Yapımı Lazanya" required>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="category_id" class="form-label">Kategori *</label>
-                            <select class="form-select" id="category_id" name="category_id" required>
-                                <option value="">Kategori seçin</option>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Kategori</label>
+                            <select class="form-select" name="category_id" required>
+                                <option value="" selected disabled>Seçiniz...</option>
                                 {% for category in categories %}
                                 <option value="{{ category.id }}">{{ category.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Kısa Açıklama *</label>
-                            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Fotoğraf</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="prep_time" class="form-label">Hazırlık Süresi (dk)</label>
-                                <input type="number" class="form-control" id="prep_time" name="prep_time" min="0">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="cook_time" class="form-label">Pişirme Süresi (dk)</label>
-                                <input type="number" class="form-control" id="cook_time" name="cook_time" min="0">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="servings" class="form-label">Kaç Kişilik</label>
-                                <input type="number" class="form-control" id="servings" name="servings" min="1">
-                            </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted small">Kısa Açıklama</label>
+                            <textarea class="form-control" name="content" rows="2" placeholder="Tarifinden kısaca bahset..." required></textarea>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="ingredients" class="form-label">Malzemeler</label>
-                            <textarea class="form-control" id="ingredients" name="ingredients" 
-                                      rows="6" placeholder="Her satıra bir malzeme yazın..."></textarea>
+
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-clock text-warning me-1"></i> Hazırlık (Dk)</label>
+                            <input type="number" class="form-control text-center" name="prep_time" placeholder="0">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="instructions" class="form-label">Yapılışı</label>
-                            <textarea class="form-control" id="instructions" name="instructions" 
-                                      rows="8" placeholder="Adım adım tarifi yazın..."></textarea>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-fire text-danger me-1"></i> Pişirme (Dk)</label>
+                            <input type="number" class="form-control text-center" name="cook_time" placeholder="0">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Tarif Fotoğrafı</label>
-                            <input type="file" class="form-control" id="image" name="image" 
-                                   accept="image/*">
-                            <small class="text-muted">JPG, PNG, GIF formatlarında maksimum 16MB</small>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small"><i class="fas fa-users text-info me-1"></i> Porsiyon</label>
+                            <input type="number" class="form-control text-center" name="servings" placeholder="1">
                         </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ url_for('index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> İptal
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save"></i> Tarifi Kaydet
-                            </button>
+
+                        <hr class="border-secondary opacity-25 my-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-success"><i class="fas fa-shopping-basket me-2"></i>Malzemeler</label>
+                            <textarea class="form-control" name="ingredients" rows="8" placeholder="Her satıra bir malzeme yazın..."></textarea>
                         </div>
-                    </form>
-                </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-primary"><i class="fas fa-list-ol me-2"></i>Yapılışı</label>
+                            <textarea class="form-control" name="instructions" rows="8" placeholder="Tarifi adım adım anlatın..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-light rounded-pill px-4">İptal</a>
+                        <button type="submit" class="btn btn-primary-glow px-5 rounded-pill fw-bold">
+                            <i class="fas fa-paper-plane me-2"></i> Yayınla
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

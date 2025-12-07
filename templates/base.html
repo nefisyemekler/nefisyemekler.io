@@ -27,7 +27,27 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Ana Sayfa</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="openCategoriesModal(event)"><i class="fas fa-th-large me-1"></i> Kategoriler</a></li>
+                    
+                    <!-- Kategoriler Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-th-large me-1"></i> Kategoriler
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-categories bg-dark border-secondary" data-bs-theme="dark">
+                            {% if all_categories %}
+                                {% for category in all_categories %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('category', slug=category.slug) }}">
+                                        <i class="fas fa-utensils me-2"></i>{{ category.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><span class="dropdown-item-text">Henüz kategori yok</span></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('ai_recipe') }}"><i class="fas fa-robot me-1"></i> AI Şef</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('calorie_calculator') }}"><i class="fas fa-calculator me-1"></i> Kalori</a></li>
                     
@@ -60,27 +80,7 @@
         </div>
     </nav>
 
-    <!-- Categories Modal -->
-    <div class="categories-modal" id="categoriesModal">
-        <div class="categories-modal-content">
-            <span class="categories-close" onclick="closeCategoriesModal()">&times;</span>
-            <h3><i class="fas fa-th-large"></i> Kategoriler</h3>
-            <div class="categories-list">
-                {% if all_categories %}
-                    {% for category in all_categories %}
-                    <a href="{{ url_for('category', slug=category.slug) }}" class="category-item">
-                        <i class="fas fa-utensils"></i>
-                        {{ category.name }}
-                    </a>
-                    {% endfor %}
-                {% else %}
-                    <p>Henüz kategori eklenmemiş.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="container" style="margin-top: 100px;">
+    <div class="container" style="margin-top: 80px; padding-top: 20px;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -97,14 +97,43 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="py-5 text-center text-muted">
-        <div class="container">
-            <div class="mb-4">
-                <a href="#" class="text-white mx-2"><i class="fab fa-instagram fa-lg"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-twitter fa-lg"></i></a>
-                <a href="#" class="text-white mx-2"><i class="fab fa-youtube fa-lg"></i></a>
+<footer class="glass-footer text-white mt-auto">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h4 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                        <i class="fas fa-utensils me-2 text-primary"></i>Nefis Yemekler
+                    </h4>
+                    <p class="text-muted small">
+                        Yapay zeka destekli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Lezzet sanatını keşfedin.
+                    </p>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold mb-3 text-light">Hızlı Erişim</h5>
+                    <ul class="list-unstyled text-muted small">
+                        <li class="mb-2"><a href="{{ url_for('index') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>Ana Sayfa</a></li>
+                        <li class="mb-2"><a href="{{ url_for('ai_recipe') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>AI Şef</a></li>
+                        <li class="mb-2"><a href="{{ url_for('calorie_calculator') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>Kalori Hesapla</a></li>
+                        <li class="mb-2"><a href="{{ url_for('contact') }}" class="footer-link"><i class="fas fa-chevron-right me-2 text-primary"></i>İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h5 class="fw-bold mb-3 text-light">Bizi Takip Edin</h5>
+                    <p class="text-muted small mb-3">En yeni tariflerden haberdar olmak için sosyal medya hesaplarımızı takip edin.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
             </div>
-            <p class="mb-0">&copy; 2025 Nefis Yemekler. Lezzet Sanatı.</p>
+        </div>
+
+        <div class="footer-bottom py-3 text-center border-top border-secondary border-opacity-25">
+            <small class="text-muted">&copy; 2025 Nefis Yemekler. Tüm hakları saklıdır.</small>
         </div>
     </footer>
 
