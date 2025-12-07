@@ -3,106 +3,95 @@
 {% block title %}Ana Sayfa - Nefis Yemekler{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section text-white py-5">
-    <div class="container text-center">
-        <h1 class="display-4 mb-3 hero-title animate-fade-in">Nefis Yemekler</h1>
-        <p class="lead mb-4 animate-fade-in-delay">Lezzetli tarifleri keşfedin ve paylaşın</p>
-        
-        <!-- Arama Kutusu -->
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-7 col-lg-6">
-                <form action="{{ url_for('search') }}" method="GET">
-                    <div class="input-group shadow">
-                        <input type="search" name="q" class="form-control" 
-                               placeholder="Tarif ara..." 
-                               value="{{ request.args.get('q', '') }}">
-                        <button class="btn btn-warning" type="submit">
-                            <i class="fas fa-search"></i> Ara
-                        </button>
-                    </div>
+<section class="hero-wrapper pt-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+                <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill">🔥 Haftanın Trendi</span>
+                <h1 class="hero-title">Lezzetin Sanata<br>Dönüştüğü Yer.</h1>
+                <p class="hero-desc">Yapay zeka destekli tarifler ve kalori takibi ile mutfağınızda şef sizsiniz. Binlerce tarifi keşfedin.</p>
+                
+                <form action="{{ url_for('search') }}" method="GET" class="d-flex position-relative mb-4">
+                    <input type="search" name="q" class="form-control glass-search w-100" placeholder="Bugün ne pişirmek istersin? (Örn: Makarna, Kek...)" value="{{ request.args.get('q', '') }}">
+                    <button class="btn position-absolute end-0 top-0 h-100 pe-4 text-white" type="submit">
+                        <i class="fas fa-search fa-lg"></i>
+                    </button>
                 </form>
+
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{{ url_for('ai_recipe') }}" class="btn btn-primary-glow"><i class="fas fa-magic me-2"></i> AI Tarif Ã–ner</a>
+                    <a href="#recipes-grid" class="btn btn-outline-light rounded-pill px-4">Keşfet</a>
+                </div>
             </div>
-        </div>
-        
-        <!-- Hızlı Butonlar -->
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            {% if not current_user.is_authenticated %}
-            <a href="{{ url_for('register') }}" class="btn btn-light">
-                <i class="fas fa-user-plus"></i> Üye Ol
-            </a>
-            {% else %}
-            <a href="{{ url_for('add_recipe') }}" class="btn btn-light">
-                <i class="fas fa-plus-circle"></i> Tarif Ekle
-            </a>
-            {% endif %}
-            <a href="{{ url_for('ai_recipe') }}" class="btn btn-success">
-                <i class="fas fa-robot"></i> AI Tarif Önerisi
-            </a>
-            <a href="{{ url_for('calorie_calculator') }}" class="btn btn-info">
-                <i class="fas fa-calculator"></i> Kalori Hesapla
-            </a>
+
+            <div class="col-lg-6 text-center position-relative">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(255, 159, 67, 0.2) 0%, transparent 70%); z-index: -1;"></div>
+                
+                <img src="{{ url_for('static', filename='images/hero-bg.png') }}" 
+                     onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop'"
+                     class="floating-plate img-fluid" alt="Lezzetli Yemek">
+                
+                <div class="glass-card position-absolute start-0 bottom-0 p-3 d-none d-md-block" style="width: 180px; height: auto; bottom: 50px !important; animation: floatPlate 5s infinite reverse;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success rounded-circle p-2 me-2"><i class="fas fa-leaf text-white"></i></div>
+                        <div class="text-start">
+                            <small class="d-block text-muted" style="font-size: 10px;">Günün Tavsiyesi</small>
+                            <span class="fw-bold text-white">Sağlıklı & Taze</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Kategoriler Kaldırıldı - Navbar'da mevcut -->
-
-<!-- Tarifler -->
-<section class="py-5">
+<section id="recipes-grid" class="py-5">
     <div class="container">
-        <h2 class="mb-4"><i class="fas fa-fire"></i> En Yeni Tarifler</h2>
-        
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <h2 class="fw-bold mb-1" style="font-family: 'Playfair Display', serif;">En Yeni Tarifler</h2>
+                <p class="text-muted mb-0">Topluluğumuzun paylaştığı son lezzetler</p>
+            </div>
+            <a href="{{ url_for('search') }}" class="text-primary text-decoration-none">Tümünü Gör <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
         {% if recipes %}
         <div class="row g-4">
             {% for recipe in recipes %}
             <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="card h-100 recipe-card shadow-sm">
-                    {% if recipe.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
-                         class="card-img-top" alt="{{ recipe.title }}" style="height: 180px; object-fit: cover;">
-                    {% else %}
-                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
-                         style="height: 180px;">
-                        <i class="fas fa-utensils fa-3x text-white"></i>
+                <div class="glass-card">
+                    <div class="card-img-wrapper">
+                        {% if recipe.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-secondary">
+                            <i class="fas fa-utensils fa-3x text-white-50"></i>
+                        </div>
+                        {% endif %}
+                        <span class="badge bg-primary position-absolute top-0 end-0 m-3">{{ recipe.category.name }}</span>
                     </div>
-                    {% endif %}
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title mb-2">{{ recipe.title }}</h6>
-                        <div class="mb-2">
-                            <span class="badge bg-primary">{{ recipe.category.name }}</span>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1 text-warning"></i> {{ recipe.prep_time }} dk
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-fire me-1 text-danger"></i> {{ recipe.servings }} Kişilik
+                            </small>
                         </div>
-                        <div class="text-muted small mb-2">
-                            {% if recipe.prep_time or recipe.cook_time %}
-                            <i class="fas fa-clock"></i> 
-                            {% if recipe.prep_time %}{{ recipe.prep_time }}{% endif %}{% if recipe.cook_time %}+{{ recipe.cook_time }}{% endif %} dk
-                            {% endif %}
-                            {% if recipe.servings %}
-                            | <i class="fas fa-users"></i> {{ recipe.servings }} kişi
-                            {% endif %}
-                        </div>
-                        <div class="text-warning small mb-2">
-                            {% set rating = recipe.average_rating() %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" 
-                           class="btn btn-primary btn-sm mt-auto">
-                            <i class="fas fa-eye"></i> Görüntüle
-                        </a>
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-light w-100 mt-3 rounded-pill">Tarifi İncele</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="alert alert-info text-center">
-            <i class="fas fa-info-circle"></i> Henüz tarif eklenmemiş.
+        <div class="text-center py-5">
+            <i class="fas fa-cookie-bite fa-4x text-muted mb-3"></i>
+            <h3 class="text-muted">Henüz hiç tarif eklenmemiş.</h3>
+            <a href="{{ url_for('add_recipe') }}" class="btn btn-primary-glow mt-3">İlk Tarifi Sen Ekle</a>
         </div>
         {% endif %}
     </div>

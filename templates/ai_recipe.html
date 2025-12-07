@@ -1,167 +1,91 @@
 {% extends "base.html" %}
-
-{% block title %}AI Tarif Önerisi - Nefis Yemekler{% endblock %}
+{% block title %}AI Şef - Nefis Yemekler{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-robot fa-3x text-primary mb-3"></i>
-                        <h2 class="card-title">🤖 AI Tarif Asistanı</h2>
-                        <p class="text-muted">Elinizdeki malzemeleri yazın, size özel tarif önerisi sunalım!</p>
-                    </div>
-
-                    <form method="POST" action="{{ url_for('ai_recipe') }}">
-                        <div class="mb-4">
-                            <label for="ingredients" class="form-label fw-bold">
-                                <i class="fas fa-list-ul"></i> Elinizde olan malzemeler:
-                            </label>
-                            <textarea 
-                                class="form-control" 
-                                id="ingredients" 
-                                name="ingredients" 
-                                rows="5" 
-                                placeholder="Örnek: domates, yumurta, soğan, biber, tuz, karabiber..." 
-                                required></textarea>
-                            <small class="text-muted">Malzemeleri virgülle ayırarak yazın</small>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="preferences" class="form-label fw-bold">
-                                <i class="fas fa-heart"></i> Tercihleriniz (isteğe bağlı):
-                            </label>
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="preferences" 
-                                name="preferences" 
-                                placeholder="Örnek: Vejetaryen, az kalorili, hızlı hazırlanan...">
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-magic"></i> Tarif Öner
-                            </button>
-                        </div>
-                    </form>
-
-                    {% if recipe_suggestion %}
-                    <div class="mt-5 border-top pt-4">
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> AI Tarafından Önerilen Tarif
-                        </div>
-                        
-                        <div class="recipe-suggestion">
-                            <h3 class="text-primary mb-3">{{ recipe_suggestion.title }}</h3>
-                            
-                            <div class="mb-4">
-                                <h5><i class="fas fa-info-circle text-info"></i> Açıklama:</h5>
-                                <p>{{ recipe_suggestion.description }}</p>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5><i class="fas fa-shopping-basket text-warning"></i> Malzemeler:</h5>
-                                <ul class="list-group">
-                                    {% for ingredient in recipe_suggestion.ingredients %}
-                                    <li class="list-group-item">{{ ingredient }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-
-                            <div class="mb-4">
-                                <h5><i class="fas fa-list-ol text-success"></i> Hazırlanışı:</h5>
-                                <ol class="list-group list-group-numbered">
-                                    {% for step in recipe_suggestion.instructions %}
-                                    <li class="list-group-item">{{ step }}</li>
-                                    {% endfor %}
-                                </ol>
-                            </div>
-
-                            <div class="row text-center">
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <i class="fas fa-clock text-primary"></i>
-                                            <p class="mb-0"><strong>Hazırlık:</strong></p>
-                                            <p class="mb-0">{{ recipe_suggestion.prep_time }} dk</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <i class="fas fa-fire text-danger"></i>
-                                            <p class="mb-0"><strong>Pişirme:</strong></p>
-                                            <p class="mb-0">{{ recipe_suggestion.cook_time }} dk</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <i class="fas fa-users text-success"></i>
-                                            <p class="mb-0"><strong>Porsiyon:</strong></p>
-                                            <p class="mb-0">{{ recipe_suggestion.servings }} kişilik</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-4 text-center">
-                                <a href="{{ url_for('ai_recipe') }}" class="btn btn-secondary">
-                                    <i class="fas fa-redo"></i> Yeni Tarif İste
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if error %}
-                    <div class="alert alert-danger mt-4">
-                        <i class="fas fa-exclamation-triangle"></i> {{ error }}
-                    </div>
-                    {% endif %}
-                </div>
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-glow mb-2"><i class="fas fa-robot me-1"></i> Yapay Zeka Destekli</span>
+                <h1 class="display-4 fw-bold" style="font-family: 'Playfair Display', serif;">AI Mutfak Asistanı</h1>
+                <p class="text-muted">Dolabındaki malzemeleri söyle, sana özel gurme tarifler hazırlayalım.</p>
             </div>
 
-            <div class="card mt-4 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-lightbulb text-warning"></i> Nasıl Çalışır?</h5>
-                    <ul>
-                        <li>Elinizdeki malzemeleri yazın</li>
-                        <li>Tercihlerinizi belirtin (opsiyonel)</li>
-                        <li>AI, malzemelerinize uygun en iyi tarifi önerir</li>
-                        <li>Detaylı tarif ve adımları görün</li>
-                    </ul>
+            <div class="glass-card p-4 p-md-5 mb-5">
+                <form method="POST">
+                    <div class="mb-4">
+                        <label class="form-label h5 text-light"><i class="fas fa-carrot text-warning me-2"></i>Elinizdeki Malzemeler</label>
+                        <textarea class="form-control" name="ingredients" rows="4" placeholder="Örn: 2 yumurta, biraz domates, bayat ekmek, kaşar peyniri..." required></textarea>
+                        <div class="form-text text-muted">Malzemeleri virgülle ayırarak yazabilirsiniz.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label h5 text-light"><i class="fas fa-sliders-h text-info me-2"></i>Tercihler (Opsiyonel)</label>
+                        <input type="text" class="form-control" name="preferences" placeholder="Örn: Acı olmasın, 15 dakikada hazırlansın, diyet olsun...">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary-glow py-3 fw-bold">
+                            <i class="fas fa-magic me-2"></i> Sihirli Tarifi Oluştur
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {% if recipe_suggestion %}
+            <div class="glass-card border-success p-4 p-md-5 position-relative overflow-hidden">
+                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(29, 209, 161, 0.2) 0%, transparent 70%);"></div>
+
+                <div class="text-center mb-4">
+                    <h2 class="text-success fw-bold" style="font-family: 'Playfair Display', serif;">{{ recipe_suggestion.title }}</h2>
+                    <p class="text-light fst-italic">"{{ recipe_suggestion.description }}"</p>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 h-100" style="background: rgba(255,255,255,0.03);">
+                            <h5 class="text-warning mb-3"><i class="fas fa-list-ul me-2"></i>Malzemeler</h5>
+                            <ul class="text-muted small mb-0 ps-3">
+                                {% for item in recipe_suggestion.ingredients %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 h-100" style="background: rgba(255,255,255,0.03);">
+                            <h5 class="text-info mb-3"><i class="fas fa-fire me-2"></i>Detaylar</h5>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>Hazırlık:</span> <strong>{{ recipe_suggestion.prep_time }} dk</strong>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mt-2">
+                                <span>Pişirme:</span> <strong>{{ recipe_suggestion.cook_time }} dk</strong>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mt-2">
+                                <span>Porsiyon:</span> <strong>{{ recipe_suggestion.servings }} Kişilik</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="text-primary mb-3"><i class="fas fa-sort-numeric-down me-2"></i>Hazırlanışı</h5>
+                    <ol class="text-muted ps-3">
+                        {% for step in recipe_suggestion.instructions %}
+                        <li class="mb-2">{{ step }}</li>
+                        {% endfor %}
+                    </ol>
                 </div>
             </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="alert alert-danger mt-4 bg-danger bg-opacity-25 border-danger text-light">
+                <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
+            </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
-
-<style>
-.recipe-suggestion {
-    background-color: #f8f9fa;
-    padding: 2rem;
-    border-radius: 10px;
-}
-
-.list-group-item {
-    border: 1px solid #dee2e6;
-    margin-bottom: 0.5rem;
-    border-radius: 5px !important;
-}
-
-.card.bg-light {
-    transition: transform 0.2s;
-}
-
-.card.bg-light:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-</style>
 {% endblock %}

@@ -4,206 +4,149 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
+    <div class="row g-5">
+        
         <div class="col-lg-8">
-            <!-- Recipe Header -->
-            <div class="card mb-4">
-                {% if recipe.image %}
-                <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" 
-                     class="card-img-top" alt="{{ recipe.title }}" style="max-height: 400px; object-fit: cover;">
-                {% endif %}
-                <div class="card-body">
-                    <h1 class="card-title">{{ recipe.title }}</h1>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-primary">{{ recipe.category.name }}</span>
-                        <span class="text-muted">
-                            <i class="fas fa-user"></i> {{ recipe.author.username }}
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <span class="text-warning">
-                            {% set rating = recipe.average_rating() %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                            ({{ rating|round(1) }})
-                        </span>
-                        <span class="text-muted ms-2">
-                            {{ recipe.comments|length }} yorum
-                        </span>
-                    </div>
-                    <div class="row text-center mb-3">
-                        {% if recipe.prep_time %}
-                        <div class="col-md-4">
-                            <i class="fas fa-clock text-primary"></i>
-                            <p class="mb-0"><strong>Hazırlık</strong></p>
-                            <p>{{ recipe.prep_time }} dakika</p>
-                        </div>
-                        {% endif %}
-                        {% if recipe.cook_time %}
-                        <div class="col-md-4">
-                            <i class="fas fa-fire text-danger"></i>
-                            <p class="mb-0"><strong>Pişirme</strong></p>
-                            <p>{{ recipe.cook_time }} dakika</p>
-                        </div>
-                        {% endif %}
-                        {% if recipe.servings %}
-                        <div class="col-md-4">
-                            <i class="fas fa-users text-success"></i>
-                            <p class="mb-0"><strong>Porsiyon</strong></p>
-                            <p>{{ recipe.servings }} kişilik</p>
-                        </div>
-                        {% endif %}
-                    </div>
+            <div class="glass-card mb-5 p-0 overflow-hidden">
+                <div style="height: 400px; position: relative;">
+                    {% if recipe.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + recipe.image) }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ recipe.title }}">
+                    {% else %}
+                    <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center"><i class="fas fa-utensils fa-4x text-white-50"></i></div>
+                    {% endif %}
                     
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 150px; background: linear-gradient(to top, var(--bg-dark), transparent);"></div>
+                </div>
+
+                <div class="card-body p-4 p-md-5" style="margin-top: -80px; position: relative; z-index: 2;">
+                    <span class="badge bg-primary mb-3">{{ recipe.category.name }}</span>
+                    <h1 class="display-4 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">{{ recipe.title }}</h1>
+                    
+                    <div class="d-flex align-items-center gap-4 mb-4 text-muted">
+                        <span><i class="fas fa-user-circle me-2 text-primary"></i>{{ recipe.author.username }}</span>
+                        <span>
+                            {% set rating = recipe.average_rating() %}
+                            <i class="fas fa-star text-warning me-1"></i>{{ rating|round(1) }} 
+                            <small>({{ recipe.comments|length }} yorum)</small>
+                        </span>
+                    </div>
+
+                    <p class="lead text-light opacity-75">{{ recipe.content }}</p>
+                    
+                    <div class="row g-3 mt-4 text-center">
+                        <div class="col-4">
+                            <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.05);">
+                                <i class="fas fa-clock fa-lg text-warning mb-2"></i>
+                                <div class="small text-muted">Hazırlık</div>
+                                <div class="fw-bold">{{ recipe.prep_time }} dk</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.05);">
+                                <i class="fas fa-fire fa-lg text-danger mb-2"></i>
+                                <div class="small text-muted">Pişirme</div>
+                                <div class="fw-bold">{{ recipe.cook_time }} dk</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.05);">
+                                <i class="fas fa-users fa-lg text-success mb-2"></i>
+                                <div class="small text-muted">Kişi</div>
+                                <div class="fw-bold">{{ recipe.servings }}</div>
+                            </div>
+                        </div>
+                    </div>
+
                     {% if current_user.is_authenticated and (current_user.id == recipe.user_id or current_user.is_admin) %}
-                    <div class="mb-3">
-                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i> Düzenle
-                        </a>
-                        <form action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" method="POST" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm" 
-                                    onclick="return confirm('Bu tarifi silmek istediğinizden emin misiniz?')">
-                                <i class="fas fa-trash"></i> Sil
-                            </button>
+                    <div class="mt-4 pt-4 border-top border-secondary">
+                        <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-warning btn-sm"><i class="fas fa-edit"></i> Düzenle</a>
+                        <form action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" method="POST" class="d-inline ms-2">
+                            <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Emin misiniz?')"><i class="fas fa-trash"></i> Sil</button>
                         </form>
                     </div>
                     {% endif %}
-                    
-                    <hr>
-                    <h3>Açıklama</h3>
-                    <p>{{ recipe.content }}</p>
                 </div>
             </div>
 
-            <!-- Ingredients -->
-            {% if recipe.ingredients %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-list"></i> Malzemeler</h4>
-                </div>
-                <div class="card-body">
-                    <pre class="mb-0">{{ recipe.ingredients }}</pre>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Instructions -->
-            {% if recipe.instructions %}
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-book"></i> Yapılışı</h4>
-                </div>
-                <div class="card-body">
-                    <pre class="mb-0">{{ recipe.instructions }}</pre>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Comments Section -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="mb-0"><i class="fas fa-comments"></i> Yorumlar ({{ comments|length }})</h4>
-                </div>
-                <div class="card-body">
-                    {% if current_user.is_authenticated %}
-                    <form method="POST" action="{{ url_for('add_comment', recipe_id=recipe.id) }}" class="mb-4">
-                        <div class="mb-3">
-                            <label class="form-label">Puanınız:</label>
-                            <div class="rating-input">
-                                {% for i in range(1, 6) %}
-                                <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}">
-                                <label for="star{{ i }}"><i class="fas fa-star"></i></label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <textarea name="body" class="form-control" rows="3" 
-                                      placeholder="Yorumunuzu yazın..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Yorum Yap
-                        </button>
-                    </form>
-                    {% else %}
-                    <div class="alert alert-info">
-                        Yorum yapabilmek için <a href="{{ url_for('login') }}">giriş yapın</a>.
+            <div class="glass-card p-4">
+                <h3 class="mb-4" style="font-family: 'Playfair Display', serif;">Yorumlar ({{ comments|length }})</h3>
+                
+                {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('add_comment', recipe_id=recipe.id) }}" class="mb-5">
+                    <div class="mb-3">
+                        <textarea name="body" class="form-control" rows="3" placeholder="Tarif hakkında ne düşünüyorsun?" required></textarea>
                     </div>
-                    {% endif %}
-
-                    <hr>
-
-                    {% for comment in comments %}
-                    <div class="comment mb-3 p-3 border rounded">
-                        <div class="d-flex justify-content-between">
-                            <strong><i class="fas fa-user"></i> {{ comment.user.username }}</strong>
-                            <small class="text-muted">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="rating-input">
+                            <select name="rating" class="form-select form-select-sm" style="width: auto;">
+                                <option value="5">⭐⭐⭐⭐⭐ - Mükemmel</option>
+                                <option value="4">⭐⭐⭐⭐ - Çok İyi</option>
+                                <option value="3">⭐⭐⭐ - İyi</option>
+                                <option value="2">⭐⭐ - Orta</option>
+                                <option value="1">⭐ - Geliştirilmeli</option>
+                            </select>
                         </div>
-                        {% if comment.rating %}
-                        <div class="text-warning">
-                            {% for i in range(comment.rating) %}
-                                <i class="fas fa-star"></i>
-                            {% endfor %}
+                        <button type="submit" class="btn btn-primary-glow">Yorum Yap</button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-warning">Yorum yapmak için <a href="{{ url_for('login') }}" class="alert-link">giriş yapmalısınız</a>.</div>
+                {% endif %}
+
+                {% for comment in comments %}
+                <div class="d-flex gap-3 mb-4 pb-4 border-bottom border-secondary">
+                    <div class="bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <span class="fw-bold text-primary">{{ comment.user.username[0]|upper }}</span>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold">{{ comment.user.username }}</h6>
+                        <div class="text-warning small mb-2">
+                            {% for i in range(comment.rating or 0) %}<i class="fas fa-star"></i>{% endfor %}
+                        </div>
+                        <p class="text-muted mb-0">{{ comment.body }}</p>
+                        <small class="text-muted opacity-50">{{ comment.created_at.strftime('%d.%m.%Y') }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="glass-card p-4 mb-4">
+                <h4 class="mb-4 text-primary" style="font-family: 'Playfair Display', serif;"><i class="fas fa-shopping-basket me-2"></i>Malzemeler</h4>
+                <ul class="list-unstyled">
+                    {% if recipe.ingredients %}
+                        {% for line in recipe.ingredients.split('\n') %}
+                        {% if line.strip() %}
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                            <span class="text-light">{{ line }}</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="glass-card p-4">
+                <h4 class="mb-4 text-primary" style="font-family: 'Playfair Display', serif;"><i class="fas fa-list-ol me-2"></i>Yapılışı</h4>
+                <div class="steps">
+                    {% if recipe.instructions %}
+                        {% for line in recipe.instructions.split('\n') %}
+                        {% if line.strip() %}
+                        <div class="d-flex gap-3 mb-4">
+                            <div class="flex-shrink-0">
+                                <span class="badge bg-primary rounded-circle p-2" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">{{ loop.index }}</span>
+                            </div>
+                            <p class="text-light mb-0">{{ line }}</p>
                         </div>
                         {% endif %}
-                        <p class="mb-0 mt-2">{{ comment.body }}</p>
-                    </div>
-                    {% endfor %}
-
-                    {% if not comments %}
-                    <p class="text-muted text-center">Henüz yorum yapılmamış. İlk yorumu siz yapın!</p>
+                        {% endfor %}
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Related Recipes -->
-            {% if related_recipes %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Benzer Tarifler</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    {% for related in related_recipes %}
-                    <a href="{{ url_for('recipe_detail', recipe_id=related.id) }}" 
-                       class="list-group-item list-group-item-action">
-                        {{ related.title }}
-                        <span class="badge bg-primary float-end">{{ related.category.name }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.rating-input {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-}
-.rating-input input {
-    display: none;
-}
-.rating-input label {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #ddd;
-}
-.rating-input input:checked ~ label,
-.rating-input label:hover,
-.rating-input label:hover ~ label {
-    color: #ffc107;
-}
-</style>
 {% endblock %}

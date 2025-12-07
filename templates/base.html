@@ -3,236 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Nefis Yemekler{% endblock %}</title>
+    <title>{% block title %}Nefis Yemekler - Modern Tarifler{% endblock %}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+    <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-utensils"></i> Nefis Yemekler
+                <i class="fas fa-utensils me-2"></i>Nefis<span style="color:var(--primary)">Yemekler</span>
             </a>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Ana Sayfa</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Kategoriler
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% for category in all_categories %}
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('category', slug=category.slug) }}">
-                                    {{ category.name }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">Hakkımızda</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('testimonials') }}">Yorumlar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('contact') }}">İletişim</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-warning" href="{{ url_for('ai_recipe') }}">
-                            <i class="fas fa-robot"></i> AI Tarif Önerisi
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-info" href="{{ url_for('calorie_calculator') }}">
-                            <i class="fas fa-calculator"></i> Kalori Hesaplayıcı
-                        </a>
-                    </li>
-                </ul>
-                <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET" role="search">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Tarif ara..." aria-label="Search" value="{{ request.args.get('q', '') }}">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Ana Sayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="openCategoriesModal(event)"><i class="fas fa-th-large me-1"></i> Kategoriler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('ai_recipe') }}"><i class="fas fa-robot me-1"></i> AI Şef</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('calorie_calculator') }}"><i class="fas fa-calculator me-1"></i> Kalori</a></li>
+                    
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('add_recipe') }}">
-                                <i class="fas fa-plus-circle"></i> Tarif Ekle
+                        <li class="nav-item dropdown ms-3">
+                            <a class="nav-link dropdown-toggle btn btn-sm border border-light rounded-pill px-3" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> {{ current_user.username }}
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('my_recipes') }}">
-                                <i class="fas fa-book"></i> Tariflerim
-                            </a>
-                        </li>
-                        {% if current_user.is_admin %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
-                                <i class="fas fa-cog"></i> Admin Panel
-                            </a>
-                        </li>
-                        {% endif %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> {{ current_user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Çıkış Yap</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" data-bs-theme="dark">
+                                <li><a class="dropdown-item" href="{{ url_for('my_recipes') }}">Tariflerim</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('add_recipe') }}">Tarif Ekle</a></li>
+                                {% if current_user.is_admin %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-warning" href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Çıkış Yap</a></li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
-                                <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                            </a>
+                        <li class="nav-item ms-3">
+                            <a href="{{ url_for('login') }}" class="btn btn-outline-light rounded-pill px-4">Giriş</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register') }}">
-                                <i class="fas fa-user-plus"></i> Kayıt Ol
-                            </a>
+                        <li class="nav-item ms-2">
+                            <a href="{{ url_for('register') }}" class="btn btn-primary-glow">Kayıt Ol</a>
                         </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link dark-mode-toggle" onclick="toggleDarkMode()" title="Karanlık Mod">
-                            <i class="fas fa-moon" id="darkModeIcon"></i>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="container mt-3">
+    <!-- Categories Modal -->
+    <div class="categories-modal" id="categoriesModal">
+        <div class="categories-modal-content">
+            <span class="categories-close" onclick="closeCategoriesModal()">&times;</span>
+            <h3><i class="fas fa-th-large"></i> Kategoriler</h3>
+            <div class="categories-list">
+                {% if all_categories %}
+                    {% for category in all_categories %}
+                    <a href="{{ url_for('category', slug=category.slug) }}" class="category-item">
+                        <i class="fas fa-utensils"></i>
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p>Henüz kategori eklenmemiş.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top: 100px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
                 {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="background: rgba(255,255,255,0.9);">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
-    <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white mt-5 py-4">
+    <footer class="py-5 text-center text-muted">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5><i class="fas fa-utensils"></i> Nefis Yemekler</h5>
-                    <p>En lezzetli tariflerin adresi</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Hızlı Bağlantılar</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url_for('index') }}" class="text-white">Ana Sayfa</a></li>
-                        <li><a href="{{ url_for('about') }}" class="text-white">Hakkımızda</a></li>
-                        <li><a href="{{ url_for('contact') }}" class="text-white">İletişim</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Kategoriler</h5>
-                    <ul class="list-unstyled">
-                        {% for category in all_categories[:4] %}
-                        <li>
-                            <a href="{{ url_for('category', slug=category.slug) }}" class="text-white">
-                                {{ category.name }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+            <div class="mb-4">
+                <a href="#" class="text-white mx-2"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-twitter fa-lg"></i></a>
+                <a href="#" class="text-white mx-2"><i class="fab fa-youtube fa-lg"></i></a>
             </div>
-            <hr class="bg-white">
-            <div class="text-center">
-                <p>&copy; 2025 Nefis Yemekler. Tüm hakları saklıdır.</p>
-            </div>
+            <p class="mb-0">&copy; 2025 Nefis Yemekler. Lezzet Sanatı.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Dark Mode Script -->
-    <script>
-        // Animated bubbles oluştur
-        function createBubbles() {
-            const colors = ['#667eea', '#764ba2', '#4855fe', '#ffe537'];
-            const bubbleCount = 15;
-            
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                
-                const size = Math.random() * 60 + 20;
-                const left = Math.random() * 100;
-                const delay = Math.random() * 15;
-                const duration = Math.random() * 20 + 15;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                bubble.style.width = size + 'px';
-                bubble.style.height = size + 'px';
-                bubble.style.left = left + '%';
-                bubble.style.backgroundColor = color;
-                bubble.style.animationDelay = delay + 's';
-                bubble.style.animationDuration = duration + 's';
-                
-                document.body.appendChild(bubble);
-            }
-        }
-        
-        // Dark mode toggle fonksiyonu
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            
-            // Icon değiştir
-            const icon = document.getElementById('darkModeIcon');
-            if (isDarkMode) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-            
-            // LocalStorage'a kaydet
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        }
-        
-        // Sayfa yüklendiğinde
-        document.addEventListener('DOMContentLoaded', function() {
-            // Dark mode kontrolü
-            const darkMode = localStorage.getItem('darkMode');
-            if (darkMode === 'enabled') {
-                document.body.classList.add('dark-mode');
-                const icon = document.getElementById('darkModeIcon');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            }
-            
-            // Bubbles oluştur
-            createBubbles();
-        });
-    </script>
-    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
