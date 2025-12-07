@@ -30,9 +30,14 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-muted small">Yeni Fotoğraf</label>
+                            <label class="form-label text-muted small">Fotoğraf URL'si</label>
+                            <input type="url" class="form-control" name="image_url" placeholder="https://i.hizliresim.com/xxxxx.jpeg" value="{{ recipe.image if recipe.image and recipe.image.startswith('http') else '' }}">
+                            <div class="form-text text-muted">Hızlıresim veya benzeri siteden link girin</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Veya Dosya Yükle</label>
                             <input type="file" class="form-control" name="image" accept="image/*">
-                            {% if recipe.image %}
+                            {% if recipe.image and not recipe.image.startswith('http') %}
                             <div class="form-text text-muted">Mevcut: {{ recipe.image }}</div>
                             {% endif %}
                         </div>
