@@ -795,5 +795,8 @@ def init_db():
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     with app.app_context():
-        db.create_all()
+        if not app.config.get('DISABLE_DB'):
+            db.create_all()
+        else:
+            print('Skipping db.create_all() because DISABLE_DB=1')
     app.run(debug=True)
