@@ -7,274 +7,45 @@ import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
-from models import db, User, Category, Recipe, Comment, Page, Image
-from datetime import datetime
-from urllib.parse import urljoin
+# Database initialization moved to CLI to avoid heavy import-time work in serverless
+def seed_database():
+    """Create tables and seed initial data. Call from CLI or in development only."""
+    with app.app_context():
+        try:
+            db.create_all()
+            print('✓ Database tables created/verified')
 
-# Load environment variables
-load_dotenv()
+            # Seed database with initial data (admin + categories)
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(username='admin', is_admin=True)
+                admin.set_password('admin123')
+                db.session.add(admin)
+                print('✓ Admin user created (username: admin, password: admin123)')
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+            categories_data = [
+                {'name': 'Kahvaltı', 'slug': 'kahvalti', 'description': 'Güne enerjik başlamak için lezzetli kahvaltı tarifleri'},
+                {'name': 'Ana Yemekler', 'slug': 'ana-yemekler', 'description': 'Doyurucu ve lezzetli ana yemek tarifleri'},
+                {'name': 'Tatlılar', 'slug': 'tatlilar', 'description': 'Damak tadınıza uygun tatlı tarifleri'},
+                {'name': 'Çorbalar', 'slug': 'corbalar', 'description': 'Sıcacık ve doyurucu çorba tarifleri'},
+                {'name': 'Salatalar', 'slug': 'salatalar', 'description': 'Sağlıklı ve ferahlatıcı salata tarifleri'},
+                {'name': 'Dünya Mutfağı', 'slug': 'dunya-mutfagi', 'description': 'Dünyanın farklı ülkelerinden lezzetli tarifler'},
+            ]
 
-# Database configuration - support both SQLite (dev) and PostgreSQL (production)
-database_url = os.getenv('DATABASE_URL', 'sqlite:///nefisyemekler.db')
-# Render uses postgres:// but SQLAlchemy needs postgresql://
-if database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            for cat_data in categories_data:
+                existing = Category.query.filter_by(slug=cat_data['slug']).first()
+                if not existing:
+                    cat = Category(**cat_data)
+                    db.session.add(cat)
+                    print(f'✓ Category added: {cat_data["name"]}')
 
-# Create upload folder if it doesn't exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            db.session.commit()
+            print('✓ Database initialization complete!')
 
-
-def resolve_image_url(candidate_url):
-    """Try to resolve a possibly-short or HTML page URL to a direct image URL.
-    Returns a direct image URL (possibly after redirects) or None if not found.
-    """
-    if not candidate_url:
-        return None
-    try:
-        # Follow redirects and prefer HEAD for speed
-        resp = requests.head(candidate_url, allow_redirects=True, timeout=5)
-        ctype = resp.headers.get('Content-Type', '')
-        if ctype.startswith('image'):
-            return resp.url
-
-        # If HEAD didn't return an image, GET the page and try to extract an image
-        resp = requests.get(candidate_url, allow_redirects=True, timeout=6)
-        ctype = resp.headers.get('Content-Type', '')
-        if ctype.startswith('image'):
-            return resp.url
-
-        html = resp.text or ''
-        # Try common meta tags
-        m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
-        if not m:
-            m = re.search(r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
-        if m:
-            img_url = m.group(1)
-            return urljoin(resp.url, img_url)
-
-        # Fallback: first <img> tag
-        m = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', html, re.I)
-        if m:
-            img_url = m.group(1)
-            return urljoin(resp.url, img_url)
-
-    except Exception:
-        # Don't crash on network errors; caller can fallback to original URL
-        return None
-    return None
-
-# Initialize extensions
-db.init_app(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-login_manager.login_message = 'Lütfen giriş yapın.'
-
-# Create tables on startup (for production)
-with app.app_context():
-    try:
-        db.create_all()
-        print('✓ Database tables created/verified')
-        
-        # Seed database with initial data
-        admin = User.query.filter_by(username='admin').first()
-        if not admin:
-            admin = User(username='admin', is_admin=True)
-            admin.set_password('admin123')
-            db.session.add(admin)
-            print('✓ Admin user created (username: admin, password: admin123)')
-        
-        # Add categories if not exist
-        categories_data = [
-            {'name': 'Kahvaltı', 'slug': 'kahvalti', 'description': 'Güne enerjik başlamak için lezzetli kahvaltı tarifleri'},
-            {'name': 'Ana Yemekler', 'slug': 'ana-yemekler', 'description': 'Doyurucu ve lezzetli ana yemek tarifleri'},
-            {'name': 'Tatlılar', 'slug': 'tatlilar', 'description': 'Damak tadınıza uygun tatlı tarifleri'},
-            {'name': 'Çorbalar', 'slug': 'corbalar', 'description': 'Sıcacık ve doyurucu çorba tarifleri'},
-            {'name': 'Salatalar', 'slug': 'salatalar', 'description': 'Sağlıklı ve ferahlatıcı salata tarifleri'},
-            {'name': 'Dünya Mutfağı', 'slug': 'dunya-mutfagi', 'description': 'Dünyanın farklı ülkelerinden lezzetli tarifler'},
-        ]
-        
-        for cat_data in categories_data:
-            existing = Category.query.filter_by(slug=cat_data['slug']).first()
-            if not existing:
-                cat = Category(**cat_data)
-                db.session.add(cat)
-                print(f'✓ Category added: {cat_data["name"]}')
-        
-        db.session.commit()
-        
-        # Add sample recipes for each category (3 per category)
-        sample_recipes = [
-            # Kahvaltı
-            {
-                'title': 'Menemen',
-                'content': 'Kahvaltının vazgeçilmez lezzeti menemen. Domates, biber ve yumurtayla hazırlanan bu enfes tarif sofranızı şenlendirecek.',
-                'ingredients': '4 adet yumurta\n2 adet domates\n2 adet sivri biber\n1 yemek kaşığı tereyağı\nTuz, karabiber',
-                'instructions': '1. Biberleri ve domatesleri küp küp doğrayın\n2. Tereyağını tavada eritin\n3. Biberleri ekleyip kavurun\n4. Domatesleri ekleyin ve suyunu çekene kadar pişirin\n5. Yumurtaları kırıp karıştırın\n6. Baharatları ekleyip servise hazır hale getirin',
-                'category_slug': 'kahvalti',
-                'prep_time': 10,
-                'cook_time': 15,
-                'servings': 2
-            },
-            {
-                'title': 'Gözleme',
-                'content': 'El açması hamuruyla yapılan geleneksel Türk böreği. Peynirli, patatesli veya kıymalı olarak hazırlayabilirsiniz.',
-                'ingredients': '3 su bardağı un\n1 su bardağı ılık su\n1 çay kaşığı tuz\n200g beyaz peynir\nMaydanoz',
-                'instructions': '1. Unu ve tuzu karıştırın\n2. Suyu ekleyip yoğurun\n3. Bezelyeleri hazırlayın\n4. Hamuru açıp iç malzemeyi yerleştirin\n5. Sacda veya tavada pişirin',
-                'category_slug': 'kahvalti',
-                'prep_time': 30,
-                'cook_time': 20,
-                'servings': 4
-            },
-            {
-                'title': 'Simit',
-                'content': 'Tahinli susam kaplı geleneksel Türk simidi. Evde kolayca yapabileceğiniz nefis bir tarif.',
-                'ingredients': '500g un\n10g yaş maya\n1 su bardağı ılık süt\n1 yemek kaşığı şeker\n1 çay kaşığı tuz\nTahin\nSusam',
-                'instructions': '1. Mayalı hamuru hazırlayın\n2. Dinlendirin\n3. Simit şekli verin\n4. Tahin ve susamla kaplayın\n5. Fırında pişirin',
-                'category_slug': 'kahvalti',
-                'prep_time': 45,
-                'cook_time': 25,
-                'servings': 6
-            },
-            # Ana Yemekler
-            {
-                'title': 'Karnıyarık',
-                'content': 'Patlıcanın kıymayla buluştuğu muhteşem Türk yemeği. Fırında pişen bu lezzet sofranızın yıldızı olacak.',
-                'ingredients': '6 adet patlıcan\n300g kıyma\n2 adet soğan\n3 adet domates\n2 adet sivri biber\nSalça, baharat',
-                'instructions': '1. Patlıcanları kızartın\n2. İç harcı hazırlayın\n3. Patlıcanları yarmadan ortasını açın\n4. İç harcı doldurun\n5. Fırında pişirin',
-                'category_slug': 'ana-yemekler',
-                'prep_time': 30,
-                'cook_time': 45,
-                'servings': 6
-            },
-            {
-                'title': 'Mantı',
-                'content': 'Kayseri\'nin meşhur mantısı. El açması hamurdan yapılan mini börekler yoğurt ve tereyağı sosuyla servis edilir.',
-                'ingredients': '500g un\n2 adet yumurta\n250g kıyma\nSoğan, tuz\nYoğurt\nTereyağı\nPul biber',
-                'instructions': '1. Hamuru hazırlayın ve incecik açın\n2. Küçük kareler kesin\n3. İç harcı yerleştirin ve kapatın\n4. Haşlayın\n5. Yoğurt ve tereyağı sosuyla servis edin',
-                'category_slug': 'ana-yemekler',
-                'prep_time': 60,
-                'cook_time': 20,
-                'servings': 4
-            },
-            {
-                'title': 'İskender Kebap',
-                'content': 'Bursa\'nın dünyaca ünlü kebabı. Döner eti, pide, domates sosu ve tereyağıyla hazırlanan muhteşem lezzet.',
-                'ingredients': '500g döner eti\n4 adet pide\n4 yemek kaşığı tereyağı\n2 su bardağı domates sosu\nYoğurt',
-                'instructions': '1. Döner etini dilimleyin\n2. Pideleri kesin ve yerleştirin\n3. Üzerine döner ekleyin\n4. Domates sosu dökün\n5. Tereyağını eritip gezdirin\n6. Yoğurtla servis edin',
-                'category_slug': 'ana-yemekler',
-                'prep_time': 20,
-                'cook_time': 30,
-                'servings': 4
-            },
-            # Tatlılar
-            {
-                'title': 'Baklava',
-                'content': 'Fıstıklı, cevizli veya fındıklı olarak hazırlayabileceğiniz geleneksel Türk tatlısı.',
-                'ingredients': '1 paket baklavalık yufka\n300g tereyağı\n400g antep fıstığı\n2 su bardağı şeker\n2 su bardağı su',
-                'instructions': '1. Yufkaları yağlayın ve dizin\n2. Fıstıkları serpin\n3. Dilimleyin\n4. Fırında pişirin\n5. Şerbeti dökün',
-                'category_slug': 'tatlilar',
-                'prep_time': 45,
-                'cook_time': 50,
-                'servings': 12
-            },
-            {
-                'title': 'Sütlaç',
-                'content': 'Fırında pişen geleneksel Türk sütlü tatlısı. Yumuşacık pirinç taneleriyle hazırlanan harika bir lezzet.',
-                'ingredients': '1 litre süt\n1/2 su bardağı pirinç\n1 su bardağı şeker\n1 yemek kaşığı un\nVanilya',
-                'instructions': '1. Pirinci haşlayın\n2. Sütü ekleyin\n3. Şeker ve unu ekleyin\n4. Kıvam alana kadar pişirin\n5. Fırında üzerini kızartın',
-                'category_slug': 'tatlilar',
-                'prep_time': 15,
-                'cook_time': 60,
-                'servings': 6
-            },
-            {
-                'title': 'Kazandibi',
-                'content': 'Tavuk göğsüyle yapılan geleneksel Osmanlı tatlısı. Alt tarafı karamelize edilmiş sütlü tatlı.',
-                'ingredients': '1 litre süt\n150g tavuk göğsü\n1 su bardağı şeker\n2 yemek kaşığı un\nVanilya',
-                'instructions': '1. Tavuk göğsünü haşlayıp didikleyin\n2. Sütü kaynatın\n3. Malzemeleri ekleyip pişirin\n4. Tepsiye döküp altını kızartın\n5. Rulo yapıp servis edin',
-                'category_slug': 'tatlilar',
-                'prep_time': 30,
-                'cook_time': 45,
-                'servings': 8
-            },
-            # Çorbalar
-            {
-                'title': 'Mercimek Çorbası',
-                'content': 'Türk mutfağının vazgeçilmez çorbası. Kırmızı mercimek ve sebzelerle hazırlanan sağlıklı ve doyurucu tarif.',
-                'ingredients': '1 su bardağı kırmızı mercimek\n1 adet soğan\n1 adet havuç\n1 yemek kaşığı salça\nTuz, karabiber\nLimon',
-                'instructions': '1. Mercimeği yıkayın\n2. Sebzeleri doğrayın ve kavurun\n3. Mercimek ve suyu ekleyin\n4. Pişirin ve blenderdan geçirin\n5. Baharatları ekleyin',
-                'category_slug': 'corbalar',
-                'prep_time': 10,
-                'cook_time': 30,
-                'servings': 4
-            },
-            {
-                'title': 'Ezogelin Çorbası',
-                'content': 'Gaziantep\'in meşhur çorbası. Kırmızı mercimek, bulgur ve pirinçle hazırlanan nefis bir tarif.',
-                'ingredients': '1 su bardağı kırmızı mercimek\n1/2 su bardağı bulgur\n1/4 su bardağı pirinç\n1 yemek kaşığı salça\nNane, kırmızı biber',
-                'instructions': '1. Mercimek, bulgur ve pirinci kaynatın\n2. Salçayı kavurun\n3. Karıştırıp pişirin\n4. Baharat ekleyin\n5. Sıcak servis edin',
-                'category_slug': 'corbalar',
-                'prep_time': 10,
-                'cook_time': 35,
-                'servings': 6
-            },
-            {
-                'title': 'Yayla Çorbası',
-                'content': 'Yoğurtlu ve nane aromalı geleneksel Türk çorbası. Yaz aylarında ferahlatıcı, kış aylarında ısıtıcı.',
-                'ingredients': '2 su bardağı yoğurt\n1/2 su bardağı pirinç\n1 yemek kaşığı un\nTuz\nNane, tereyağı',
-                'instructions': '1. Pirinci haşlayın\n2. Yoğurt ve unu çırpın\n3. Pirinç suyuna ekleyin\n4. Pişirin\n5. Naneli tereyağıyla servis edin',
-                'category_slug': 'corbalar',
-                'prep_time': 10,
-                'cook_time': 25,
-                'servings': 4
-            },
-            # Salatalar
-            {
-                'title': 'Çoban Salatası',
-                'content': 'Taze sebzelerle hazırlanan klasik Türk salatası. Yaz aylarının vazgeçilmez tariflerinden.',
-                'ingredients': '4 adet domates\n2 adet salatalık\n2 adet sivri biber\n1 adet soğan\nMaydanoz\nZeytinyağı, limon, nar ekşisi',
-                'instructions': '1. Tüm sebzeleri küp küp doğrayın\n2. Maydanozu ince kıyın\n3. Karıştırın\n4. Zeytinyağı, limon ve nar ekşisi ekleyin\n5. Servis edin',
-                'category_slug': 'salatalar',
-                'prep_time': 15,
-                'cook_time': 0,
-                'servings': 4
-            },
-            {
-                'title': 'Kısır',
-                'content': 'Bulgurla yapılan geleneksel Türk salatası. Nar ekşisi ve salça ile tatlandırılmış nefis bir tarif.',
-                'ingredients': '2 su bardağı ince bulgur\n1 su bardağı sıcak su\n2 yemek kaşığı salça\nNar ekşisi\nMaydanoz, domates, soğan\nBaharat',
-                'instructions': '1. Bulguru sıcak suyla ıslatın\n2. Salçayı ekleyin\n3. Sebzeleri doğrayın\n4. Tüm malzemeleri karıştırın\n5. Dinlendirip servis edin',
-                'category_slug': 'salatalar',
-                'prep_time': 30,
-                'cook_time': 0,
-                'servings': 6
-            },
-            {
-                'title': 'Piyaz',
-                'content': 'Fasulye salatası. Antalya\'nın meşhur salatası haşlanmış fasulye, tahin ve yumurtayla hazırlanır.',
-                'ingredients': '2 su bardağı kuru fasulye\n2 adet yumurta\n2 yemek kaşığı tahin\nSoğan, maydanoz\nZeytinyağı, limon',
-                'instructions': '1. Fasulyeyi haşlayın\n2. Yumurtaları haşlayın\n3. Soğanları doğrayın\n4. Tahin sosunu hazırlayın\n5. Karıştırıp servis edin',
-                'category_slug': 'salatalar',
-                'prep_time': 20,
-                'cook_time': 60,
-                'servings': 4
-            },
-            # Dünya Mutfağı
-            {
-                'title': 'Spaghetti Carbonara',
-                'content': 'İtalyan mutfağının klasik makarna tarifi. Yumurta, pancetta ve parmesan peyniriyle hazırlanan kremalı lezzet.',
-                'ingredients': '400g spagetti\n200g pancetta\n4 adet yumurta\n100g parmesan peyniri\nTuz, karabiber',
-                'instructions': '1. Makarnayı haşlayın\n2. Pancettayı kızartın\n3. Yumurta ve peyniri çırpın\n4. Makarnayı karıştırın\n5. Hemen servis edin',
+        except Exception as e:
+            print(f'✗ Database error: {e}')
+            import traceback
+            traceback.print_exc()
                 'category_slug': 'dunya-mutfagi',
                 'prep_time': 10,
                 'cook_time': 20,
@@ -1036,8 +807,8 @@ def inject_categories():
 @app.cli.command()
 def init_db():
     """Initialize the database."""
-    db.create_all()
-    print('Database initialized.')
+    seed_database()
+    print('Database initialized (seed ran).')
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
