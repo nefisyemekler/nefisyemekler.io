@@ -7,15 +7,60 @@ import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
-# Database initialization moved to CLI to avoid heavy import-time work in serverless
+
+# Load environment and app configuration
+from dotenv import load_dotenv
+from models import db, User, Category, Recipe, Comment, Page, Image
+from datetime import datetime
+from urllib.parse import urljoin
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+
+# Database configuration - support both SQLite (dev) and PostgreSQL (production)
+database_url = os.getenv('DATABASE_URL', 'sqlite:///nefisyemekler.db')
+# Render uses postgres:// but SQLAlchemy needs postgresql://
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+# Create upload folder if it doesn't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Optional: temporarily disable DB access (set DISABLE_DB=1 in environment)
+app.config['DISABLE_DB'] = os.getenv('DISABLE_DB', '0') == '1'
+
+# Initialize extensions
+# Only init DB if not explicitly disabled (useful for temporary maintenance)
+if not app.config.get('DISABLE_DB'):
+    db.init_app(app)
+else:
+    print('⚠️ Database access disabled via DISABLE_DB=1')
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Lütfen giriş yapın.'
+
+
 def seed_database():
     """Create tables and seed initial data. Call from CLI or in development only."""
+    if app.config.get('DISABLE_DB'):
+        print('Database seeding skipped because DISABLE_DB=1')
+        return
+
     with app.app_context():
         try:
             db.create_all()
             print('✓ Database tables created/verified')
 
-            # Seed database with initial data (admin + categories)
+            # Seed minimal initial data (admin + categories)
             admin = User.query.filter_by(username='admin').first()
             if not admin:
                 admin = User(username='admin', is_admin=True)
@@ -27,9 +72,6 @@ def seed_database():
                 {'name': 'Kahvaltı', 'slug': 'kahvalti', 'description': 'Güne enerjik başlamak için lezzetli kahvaltı tarifleri'},
                 {'name': 'Ana Yemekler', 'slug': 'ana-yemekler', 'description': 'Doyurucu ve lezzetli ana yemek tarifleri'},
                 {'name': 'Tatlılar', 'slug': 'tatlilar', 'description': 'Damak tadınıza uygun tatlı tarifleri'},
-                {'name': 'Çorbalar', 'slug': 'corbalar', 'description': 'Sıcacık ve doyurucu çorba tarifleri'},
-                {'name': 'Salatalar', 'slug': 'salatalar', 'description': 'Sağlıklı ve ferahlatıcı salata tarifleri'},
-                {'name': 'Dünya Mutfağı', 'slug': 'dunya-mutfagi', 'description': 'Dünyanın farklı ülkelerinden lezzetli tarifler'},
             ]
 
             for cat_data in categories_data:
@@ -46,6 +88,18 @@ def seed_database():
             print(f'✗ Database error: {e}')
             import traceback
             traceback.print_exc()
+
+
+# If DB is disabled, show a maintenance page for most routes to avoid runtime errors
+if app.config.get('DISABLE_DB'):
+    @app.before_request
+    def _db_disabled_handler():
+        # Allow static files and favicon
+        path = request.path or ''
+        if path.startswith('/static') or path == '/favicon.ico' or path.startswith('/uploads'):
+            return None
+        # Expose a simple maintenance page
+        return render_template('db_offline.html'), 503
                 'category_slug': 'dunya-mutfagi',
                 'prep_time': 10,
                 'cook_time': 20,
